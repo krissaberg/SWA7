@@ -1,12 +1,12 @@
-package com.mygdx.game.desktop;
+package wizard_team.wizards_tale.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mygdx.game.Game;
+import wizard_team.wizards_tale.WizardsTaleGame;
 
 public class DesktopLauncher {
-	public static void main (String[] arg) {
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		new LwjglApplication(new Game(), config);
-	}
+  public static void main(String[] arg) {
+    LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+    new LwjglApplication(new WizardsTaleGame(), config);
+  }
 }
