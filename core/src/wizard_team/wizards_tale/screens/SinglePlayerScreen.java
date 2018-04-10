@@ -19,6 +19,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import wizard_team.wizards_tale.components.PositionComponent;
+import wizard_team.wizards_tale.components.SpriteComponent;
+import wizard_team.wizards_tale.components.ReceiveInputComponent;
+import com.badlogic.gdx.math.MathUtils;
+import wizard_team.wizards_tale.components.RandomMovementComponent;
+import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.systems.RenderSystem;
+import wizard_team.wizards_tale.systems.VelocityMovementSystem;
+import wizard_team.wizards_tale.systems.RandomWalkerSystem;
+import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
   WizardsTaleGame game;
@@ -28,6 +40,9 @@ public class SinglePlayerScreen implements Screen {
   AssetManager assetManager;
   Viewport viewport;
   Camera camera;
+
+  Engine engine;
+  Touchpad touchpad;
 
   Texture whiteMageTex;
   Texture blackMageTex;
@@ -50,7 +65,39 @@ public class SinglePlayerScreen implements Screen {
     assetManager.finishLoading();
     blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
     whiteMageTex = assetManager.get("sprites/white_mage.png", Texture.class);
+
+    // Create engine
+    this.engine = createEngine();
   }
+
+  private Engine createEngine() {
+    Engine eng = new Engine();
+
+    // Player character entity
+    Entity playerCharacter = new Entity();
+    playerCharacter.add(new PositionComponent(100, 200));
+    playerCharacter.add(new SpriteComponent(blackMageTex));
+    playerCharacter.add(new ReceiveInputComponent());
+    eng.addEntity(playerCharacter);
+
+    // Random walkers
+    for (int i = 0; i < 10; i++) {
+      Entity walker = new Entity();
+      walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
+      walker.add(new SpriteComponent(whiteMageTex));
+      walker.add(new RandomMovementComponent(MathUtils.random(3)));
+      walker.add(new VelocityComponent());
+      eng.addEntity(walker);
+    }
+
+    // Systems
+    eng.addSystem(new RandomWalkerSystem());
+    eng.addSystem(new VelocityMovementSystem());
+    eng.addSystem(new RenderSystem(spriteBatch));
+    eng.addSystem(new InputSystem(touchpad));
+
+    return eng;
+  };
 
   private Stage createStage(Viewport viewport) {
     Stage stage = new Stage(viewport);
@@ -63,6 +110,7 @@ public class SinglePlayerScreen implements Screen {
 
     Touchpad touchpad = new Touchpad(5, skin);
     rootTable.add(touchpad).bottom().left();
+    this.touchpad = touchpad;
 
     rootTable.add(new Table()).expandX();
 
@@ -88,9 +136,7 @@ public class SinglePlayerScreen implements Screen {
     Gdx.gl.glClearColor(0.1f, 0, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    spriteBatch.begin();
-    spriteBatch.draw(whiteMageTex, 200, 200);
-    spriteBatch.end();
+    engine.update(dt);
 
     stage.act(dt);
     stage.draw();
