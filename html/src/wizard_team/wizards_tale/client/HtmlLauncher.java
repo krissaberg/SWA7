@@ -1,4 +1,4 @@
-package wizard_team.wizards_tale.client;
+package wizards_team.wizards_tale.client;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;

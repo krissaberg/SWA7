@@ -63,6 +63,18 @@ public class MainMenuScreen implements Screen {
           }
         });
 
+    // Testing online features
+    Button multiplayerButton = new TextButton("Multiplayer Game", skin);
+    rootTable.add(multiplayerButton);
+    startButton.addListener(
+      new ClickListener() {
+          @Override
+          public void clicked(InputEvent event, float x, float y) {
+              //game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
+              game.setScreen(new InvitePlayersScreen());
+          }
+      });
+
     return stage;
   }
 

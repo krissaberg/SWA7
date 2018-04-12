@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "359164044400",
+    "firebase_url": "https://swa7-c9bfb.firebaseio.com",
+    "project_id": "swa7-c9bfb",
+    "storage_bucket": "swa7-c9bfb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:359164044400:android:2c2d065b7fe901c1",
+        "android_client_info": {
+          "package_name": "wizard_team.wizards_tale"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "359164044400-nbg21dnaibradhqtssbcee62677nd4dh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "wizard_team.wizards_tale",
+            "certificate_hash": "3ca101a683f2a274d1c54108a506afc82f2c9417"
+          }
+        },
+        {
+          "client_id": "359164044400-trakq9biquqii5jm4ouuqdfn2oidls5h.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtmkmpUlXtJuxFtTe0erzT0sSx2hwK9K0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "359164044400-trakq9biquqii5jm4ouuqdfn2oidls5h.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
