@@ -16,17 +16,20 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+
+import wizard_team.wizards_tale.components.CounterComponent;
+import wizard_team.wizards_tale.components.GameTimeComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 import com.badlogic.gdx.math.MathUtils;
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.systems.CountDownSystem;
+import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -90,11 +93,20 @@ public class SinglePlayerScreen implements Screen {
       eng.addEntity(walker);
     }
 
+    // Clock entity
+    Entity clock = new Entity();
+    clock.add(new CounterComponent(2));
+    clock.add(new GameTimeComponent());
+    eng.addEntity(clock);
+
+
     // Systems
     eng.addSystem(new RandomWalkerSystem());
     eng.addSystem(new VelocityMovementSystem());
     eng.addSystem(new RenderSystem(spriteBatch));
     eng.addSystem(new InputSystem(touchpad));
+    eng.addSystem(new CountDownSystem());
+    eng.addSystem(new GameCycleSystem(game));
 
     return eng;
   };
@@ -120,7 +132,8 @@ public class SinglePlayerScreen implements Screen {
     return stage;
   }
 
-  public void dispose() {}
+  public void dispose() {
+  }
 
   public void hide() {}
 

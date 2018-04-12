@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import wizard_team.wizards_tale.screens.MainMenuScreen;
 
 public class WizardsTaleGame extends Game {
+
   SpriteBatch spriteBatch;
   AssetManager assetManager;
   Skin skin;
@@ -27,7 +28,7 @@ public class WizardsTaleGame extends Game {
     assetManager.finishLoading();
     skin = assetManager.get("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
-    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
+    setScreen(new MainMenuScreen(this));
   }
 
   @Override
@@ -43,5 +44,17 @@ public class WizardsTaleGame extends Game {
   public void dispose() {
     spriteBatch.dispose();
     assetManager.dispose();
+  }
+
+  public SpriteBatch getSpriteBatch() {
+    return spriteBatch;
+  }
+
+  public AssetManager getAssetManager() {
+    return assetManager;
+  }
+
+  public Skin getSkin() {
+    return skin;
   }
 }
