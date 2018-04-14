@@ -16,6 +16,8 @@ public class InputSystem extends IteratingSystem {
       ComponentMapper.getFor(ReceiveInputComponent.class);
   private ComponentMapper<PositionComponent> posMapper =
       ComponentMapper.getFor(PositionComponent.class);
+  private ComponentMapper<VelocityComponent> velMapper =
+          ComponentMapper.getFor(VelocityComponent.class);
   private Touchpad touchpad;
 
   public InputSystem(Touchpad touchpad) {
@@ -25,7 +27,8 @@ public class InputSystem extends IteratingSystem {
 
   public void processEntity(Entity e, float dt) {
     PositionComponent pos = posMapper.get(e);
-    pos.x += touchpad.getKnobPercentX();
-    pos.y += touchpad.getKnobPercentY();
+    VelocityComponent vel = velMapper.get(e);
+    vel.v_x = 100 * touchpad.getKnobPercentX();
+    vel.v_y = 100 * touchpad.getKnobPercentY();
   }
 }
