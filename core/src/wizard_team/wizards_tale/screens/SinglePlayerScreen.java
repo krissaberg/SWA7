@@ -26,6 +26,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
+import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
@@ -92,6 +93,7 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new ReceiveInputComponent());
         playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
                 blackMageTex.getWidth(), blackMageTex.getHeight())));
+        playerCharacter.add(new CollisionComponent(CollidableType.SOFT));
         eng.addEntity(playerCharacter);
 
         // Random walkers
@@ -103,6 +105,7 @@ public class SinglePlayerScreen implements Screen {
             walker.add(new VelocityComponent());
             walker.add(new BoundRectComponent(new Rectangle(0, 0,
                     whiteMageTex.getWidth(), whiteMageTex.getHeight())));
+            walker.add(new CollisionComponent(CollidableType.SOFT));
             eng.addEntity(walker);
         }
 
@@ -111,6 +114,7 @@ public class SinglePlayerScreen implements Screen {
         wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
         wall.add(new PositionComponent(200, 200));
         wall.add(new SpriteComponent(wallTexture));
+        wall.add(new CollisionComponent(CollidableType.HARD));
         eng.addEntity(wall);
 
         // Systems

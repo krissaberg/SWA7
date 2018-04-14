@@ -2,6 +2,8 @@ package wizard_team.wizards_tale.systems;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.systems.IteratingSystem;
+
+import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 import com.badlogic.ashley.core.Component;
 
@@ -24,18 +26,22 @@ public class VelocityMovementSystem extends IteratingSystem {
   private ComponentMapper<BoundRectComponent> boundMapper =
       ComponentMapper.getFor(BoundRectComponent.class);
 
+  private ComponentMapper<CollisionComponent> collisionMapper =
+          ComponentMapper.getFor(CollisionComponent.class);
+
   public VelocityMovementSystem() {
     super(Family.all(PositionComponent.class, VelocityComponent.class).get());
   }
 
-  static boolean cantPassThrough(Entity e1, Entity e2) {
-    boolean x = true;
-    for (Component c : e1.getComponents()) {
-      if (c instanceof ReceiveInputComponent) {
-        x = false;
+  private boolean cantPassThrough(Entity e1, Entity e2) {
+      // Soft entities can pass through other soft entities
+      if(collisionMapper.has(e1) && collisionMapper.has(e2)) {
+        CollisionComponent coll1 = collisionMapper.get(e1);
+        CollisionComponent coll2 = collisionMapper.get(e2);
+        return coll1.collidableType == CollidableType.HARD ||
+                coll2.collidableType == CollidableType.HARD;
       }
-    }
-    return x;
+      return false;
   }
 
   public void processEntity(Entity e, float dt) {
