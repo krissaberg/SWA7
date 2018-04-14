@@ -26,6 +26,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
+import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
@@ -36,6 +37,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.systems.CellPositionSystem;
+import wizard_team.wizards_tale.systems.CellRenderSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -87,7 +90,11 @@ public class SinglePlayerScreen implements Screen {
 
         // Player character entity
         Entity playerCharacter = new Entity();
+
+            //Positions
         playerCharacter.add(new PositionComponent(100, 200));
+        playerCharacter.add(new CellPositionComponent(0,0));
+
         playerCharacter.add(new VelocityComponent());
         playerCharacter.add(new SpriteComponent(blackMageTex));
         playerCharacter.add(new ReceiveInputComponent());
@@ -122,6 +129,10 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
         eng.addSystem(new InputSystem(touchpad));
+
+        eng.addSystem(new CellPositionSystem());
+        eng.addSystem(new CellRenderSystem(spriteBatch));
+
 
         return eng;
     }
