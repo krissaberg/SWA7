@@ -2,6 +2,9 @@ package wizard_team.wizards_tale.screens;
 
 import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
+
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+
+import java.util.HashMap;
 
 public class MainMenuScreen implements Screen {
   WizardsTaleGame game;
@@ -52,6 +57,30 @@ public class MainMenuScreen implements Screen {
     stage.addActor(rootTable);
     rootTable.setFillParent(true);
     rootTable.setDebug(true);
+
+    final Label messageList = new Label("", skin);
+    messageList.setText(
+            messageList.getText() + "\nhei"
+    );
+    ScrollPane messageScrollPane = new ScrollPane(messageList);
+    rootTable.add(messageScrollPane).expandX().expandY().bottom().left();
+
+    Button createRoomBtn = new TextButton("Create Room", skin);
+    rootTable.add(createRoomBtn);
+    createRoomBtn.addListener(
+            new ClickListener() {
+              @Override
+              public void clicked(InputEvent event, float x, float y) {
+                messageList.setText(messageList.getText() + "\nTrying to create room...");
+                game.warpClient.createRoom(
+                        "roomby",
+                        game.username,
+                        4,
+                        new HashMap<String, Object>());
+                game.warpClient.getOnlineUsers();
+              }
+            }
+    );
 
     Button startButton = new TextButton("New Game", skin);
     rootTable.add(startButton);
