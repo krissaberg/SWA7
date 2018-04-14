@@ -135,7 +135,7 @@ public class SinglePlayerScreen implements Screen {
         rootTable.setDebug(true);
         rootTable.left().bottom();
 
-        Touchpad touchpad = new Touchpad(5, skin);
+        Touchpad touchpad = new Touchpad(15, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
 
