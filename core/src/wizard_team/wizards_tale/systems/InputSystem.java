@@ -31,7 +31,6 @@ public class InputSystem extends IteratingSystem {
     private static float maxVel = 50;
 
     public void processEntity(Entity e, float dt) {
-        PositionComponent pos = posMapper.get(e);
         VelocityComponent vel = velMapper.get(e);
 
         // Get the touchpad vector
