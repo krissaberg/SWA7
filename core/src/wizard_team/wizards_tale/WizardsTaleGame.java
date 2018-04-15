@@ -8,11 +8,12 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import wizard_team.wizards_tale.screens.MainMenuScreen;
+import wizard_team.wizards_tale.screens.SinglePlayerScreen;
 
 public class WizardsTaleGame extends Game {
-  SpriteBatch spriteBatch;
-  AssetManager assetManager;
-  Skin skin;
+  private SpriteBatch spriteBatch;
+  private AssetManager assetManager;
+  private Skin skin;
 
   @Override
   public void create() {
@@ -27,6 +28,7 @@ public class WizardsTaleGame extends Game {
     assetManager.finishLoading();
     skin = assetManager.get("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
+//    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
     setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
   }
 
