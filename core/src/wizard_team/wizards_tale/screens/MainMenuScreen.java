@@ -26,14 +26,14 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import java.util.HashMap;
 
 public class MainMenuScreen implements Screen {
-  WizardsTaleGame game;
-  Skin skin;
-  Stage stage;
-  SpriteBatch spriteBatch;
-  Texture backgroundTex;
-  AssetManager assetManager;
-  Viewport viewport;
-  Camera camera;
+  private WizardsTaleGame game;
+  private Skin skin;
+  private Stage stage;
+  private SpriteBatch spriteBatch;
+  private Texture backgroundTex;
+  private AssetManager assetManager;
+  private Viewport viewport;
+  private Camera camera;
 
   public MainMenuScreen(
       WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -81,6 +81,16 @@ public class MainMenuScreen implements Screen {
               }
             }
     );
+
+    Button lobbyButton = new TextButton("New Lobby", skin);
+    rootTable.add(lobbyButton);
+    lobbyButton.addListener(
+            new ClickListener() {
+              @Override
+              public void clicked(InputEvent event, float x, float y) {
+                game.setScreen(new OnlineLobbyScreen(game));
+              }
+            });
 
     Button startButton = new TextButton("New Game", skin);
     rootTable.add(startButton);
