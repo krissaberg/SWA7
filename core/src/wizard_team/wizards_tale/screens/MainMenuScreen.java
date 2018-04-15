@@ -1,6 +1,8 @@
 package wizard_team.wizards_tale.screens;
 
 import com.badlogic.gdx.Screen;
+
+import wizard_team.wizards_tale.WarpController;
 import wizard_team.wizards_tale.WizardsTaleGame;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -62,6 +64,17 @@ public class MainMenuScreen implements Screen {
             game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
           }
         });
+
+      Button testButton = new TextButton("Test", skin);
+      rootTable.add(testButton);
+      testButton.addListener(
+              new ClickListener() {
+                  @Override
+                  public void clicked(InputEvent event, float x, float y) {
+                      WarpController wp = new WarpController();
+                      wp.getClient();
+                  }
+              });
 
     return stage;
   }
