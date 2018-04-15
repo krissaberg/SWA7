@@ -10,6 +10,7 @@ import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListe
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -52,6 +53,22 @@ public class WizardsTaleGame extends Game {
         } catch (FileNotFoundException e) {
             System.out.println("File 'game.properties' not found in assets folder.");
             System.out.println("Creating placeholder file. You have to update it with the AppWarp keys!");
+
+            Properties placeholderProperties = new Properties();
+            placeholderProperties.setProperty("api_key", "Put the AppWarp API key here");
+            placeholderProperties.setProperty("secret", "Put the AppWarp secret key here");
+
+            try {
+                FileOutputStream out = new FileOutputStream("game.properties");
+                placeholderProperties.store(out,
+                        "Placeholder game configuration file");
+                out.close();
+            } catch (FileNotFoundException e1) {
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
             e.printStackTrace();
             System.exit(2);
         } catch (IOException e) {
@@ -78,13 +95,7 @@ public class WizardsTaleGame extends Game {
         warpClient.addUpdateRequestListener(new WTUpdateRequestListener());
         warpClient.addZoneRequestListener(new WTZoneRequestListener());
 
-        System.out.println("connecting");
-        username = "wizzy";
-
-        warpClient.connectWithUserName(username);
-
         setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
-
     }
 
     @Override
