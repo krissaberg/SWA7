@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
+import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListener;
 
 import java.io.FileInputStream;
@@ -56,7 +57,7 @@ public class WizardsTaleGame extends Game {
 
             Properties placeholderProperties = new Properties();
             placeholderProperties.setProperty("api_key", "Put the AppWarp API key here");
-            placeholderProperties.setProperty("secret", "Put the AppWarp secret key here");
+            placeholderProperties.setProperty("secret_key", "Put the AppWarp secret key here");
 
             try {
                 FileOutputStream out = new FileOutputStream("game.properties");
