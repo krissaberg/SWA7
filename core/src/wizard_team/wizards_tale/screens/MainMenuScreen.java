@@ -4,6 +4,8 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WarpController;
 import wizard_team.wizards_tale.WizardsTaleGame;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,10 +21,15 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+
 public class MainMenuScreen implements Screen {
+
+  WarpController wp;
   WizardsTaleGame game;
   Skin skin;
   Stage stage;
@@ -33,49 +40,54 @@ public class MainMenuScreen implements Screen {
   Camera camera;
 
   public MainMenuScreen(
-      WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
-    this.assetManager = assetManager;
-    this.game = game;
-    this.skin = skin;
-    this.spriteBatch = spriteBatch;
-    this.camera = new OrthographicCamera();
-    this.viewport = new FitViewport(800, 600, this.camera);
-    viewport.apply(true);
-    this.stage = createStage(viewport);
-    Gdx.input.setInputProcessor(this.stage);
+  		WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
 
-    this.backgroundTex = assetManager.get("menu_background.png", Texture.class);
+	this.wp = new WarpController();
+	this.assetManager = assetManager;
+	this.game = game;
+	this.skin = skin;
+	this.spriteBatch = spriteBatch;
+	this.camera = new OrthographicCamera();
+	this.viewport = new FitViewport(800, 600, this.camera);
+	viewport.apply(true);
+	this.stage = createStage(viewport);
+	Gdx.input.setInputProcessor(this.stage);
+
+	this.backgroundTex = assetManager.get("menu_background.png", Texture.class);
   }
 
   private Stage createStage(Viewport viewport) {
-    Stage stage = new Stage(viewport);
+	Stage stage = new Stage(viewport);
+	Table rootTable = new Table();
+	stage.addActor(rootTable);
+	rootTable.setFillParent(true);
+	rootTable.setDebug(true);
 
-    Table rootTable = new Table();
-    stage.addActor(rootTable);
-    rootTable.setFillParent(true);
-    rootTable.setDebug(true);
+	Button startButton = new TextButton("New Game", skin);
+	rootTable.add(startButton);
+	startButton.addListener(
+		new ClickListener() {
+		  @Override
+		  public void clicked(InputEvent event, float x, float y) {
+			game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
+		  }
+		});
 
-    Button startButton = new TextButton("New Game", skin);
-    rootTable.add(startButton);
-    startButton.addListener(
-        new ClickListener() {
-          @Override
-          public void clicked(InputEvent event, float x, float y) {
-            game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
-          }
-        });
-
-      Button testButton = new TextButton("Test", skin);
-      rootTable.add(testButton);
-      testButton.addListener(
-              new ClickListener() {
-                  @Override
-                  public void clicked(InputEvent event, float x, float y) {
-                      WarpController wp = new WarpController();
-                  }
-              });
-
-    return stage;
+	  Button multiPlayerButton = new TextButton("Multi Player!", skin);
+	  rootTable.add(multiPlayerButton);
+	  multiPlayerButton.addListener(
+			  new ClickListener() {
+				  @Override
+				  public void clicked(InputEvent event, float x, float y) {
+				  	if (wp.getConnectionState() == 0) {
+					  game.setScreen(new MultiPlayerRoomScreen(game, spriteBatch, skin, assetManager, wp));
+					} else {
+					  //TODO Display message to user
+					  System.out.println("NOT CONNECTED");
+					}
+				  }
+			  });
+	return stage;
   }
 
   public void dispose() {}
@@ -83,7 +95,7 @@ public class MainMenuScreen implements Screen {
   public void hide() {}
 
   public void show() {
-    Gdx.input.setInputProcessor(this.stage);
+	Gdx.input.setInputProcessor(this.stage);
   }
 
   public void resume() {}
@@ -91,19 +103,19 @@ public class MainMenuScreen implements Screen {
   public void pause() {}
 
   public void render(float dt) {
-    Gdx.gl.glClearColor(0.1f, 0, 0, 1);
-    Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+	Gdx.gl.glClearColor(0.1f, 0, 0, 1);
+	Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-    spriteBatch.begin();
-    spriteBatch.draw(backgroundTex, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-    spriteBatch.end();
+	spriteBatch.begin();
+	spriteBatch.draw(backgroundTex, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+	spriteBatch.end();
 
-    stage.act(dt);
-    stage.draw();
+	stage.act(dt);
+	stage.draw();
   }
 
   public void resize(int width, int height) {
-    viewport.update(width, height, true);
-    spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+	viewport.update(width, height, true);
+	spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
   }
 }

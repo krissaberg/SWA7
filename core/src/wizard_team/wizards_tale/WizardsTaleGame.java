@@ -21,6 +21,7 @@ public class WizardsTaleGame extends Game {
 
     // Load shared assets
     assetManager.load("menu_background.png", Texture.class);
+    assetManager.load("mp_background.png", Texture.class);
     assetManager.load("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
     // Block until shared assets are loaded

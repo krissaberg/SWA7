@@ -1,9 +1,6 @@
 package wizard_team.wizards_tale;
 
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
-import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
-import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
-import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
 
 import wizard_team.wizards_tale.listeners.ConnectionListener;
 /*
@@ -42,26 +39,11 @@ public class WarpController {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //warpClient.addConnectionRequestListener(new Cthis);
     }
 
-                /*
-    public void onConnectDone(final ConnectEvent event) {
-        System.out.println("OnConnectDone" + " " + event.getResult());
-            if(event.getResult()== WarpResponseResultCode.SUCCESS){
-                System.out.println("Connection Success");
-                //showMatchMakingOption();
-            }else{
-                System.out.println("FAILED");
-            }
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        });
+    public int getConnectionState() {
+        return warpClient.getConnectionState();
     }
-            */
-
 
     public void appendLeaveNotifyResult(String s) {
         System.out.println(s);

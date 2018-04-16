@@ -31,7 +31,7 @@ public class ConnectionListener implements ConnectionRequestListener{
                 message="Bad Request";
                 break;
             case WarpResponseResultCode.CONNECTION_ERROR:
-                message="Connection Error 5";
+                message="Connection Error";
                 break;
             case WarpResponseResultCode.CONNECTION_ERROR_RECOVERABLE:
                 message="Connection Error Recoverable";
