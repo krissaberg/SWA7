@@ -19,16 +19,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
-import wizard_team.wizards_tale.components.BoundaryComponent;
+import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
-import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
@@ -41,6 +38,7 @@ import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
+import wizard_team.wizards_tale.systems.DebugRenderSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -93,7 +91,7 @@ public class SinglePlayerScreen implements Screen {
         // Player character entity
         Entity playerCharacter = new Entity();
 
-            //Positions
+        //Positions
         playerCharacter.add(new PositionComponent(100, 200));
         playerCharacter.add(new CellPositionComponent(0,0));
 
@@ -132,14 +130,16 @@ public class SinglePlayerScreen implements Screen {
         for (int x = 0; x<5; x++) {
             for (int y = 0; y < 5; y++) {
                 Entity tile = new Entity();
-                tile.add(new BoundaryComponent(rect));
+                tile.add(new CellBoundaryComponent(rect));
                 tile.add(new CellPositionComponent(
-                        (int)(x*Constants.CELL_WIDTH), (int)(y*Constants.CELL_WIDTH)));
+                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_WIDTH)));
 
-                if (x%2 == 0 && y%2 == 0) {
+                if (x % 2 == 0 && y % 2 == 0) {
                     tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
-                } else {tile.add(new CollisionComponent(Constants.CollidableType.HARD));}
-
+                } else {
+                    tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+                }
+                eng.addEntity(tile);
             }
         }
 
@@ -152,6 +152,7 @@ public class SinglePlayerScreen implements Screen {
 
         eng.addSystem(new CellPositionSystem());
         eng.addSystem(new CellRenderSystem(spriteBatch));
+        eng.addSystem(new DebugRenderSystem(spriteBatch));
 
 
         return eng;
