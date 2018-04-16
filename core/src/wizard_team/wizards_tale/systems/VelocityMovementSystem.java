@@ -11,6 +11,8 @@ import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.components.constants.Constants;
+
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.utils.ImmutableArray;
@@ -38,8 +40,8 @@ public class VelocityMovementSystem extends IteratingSystem {
       if(collisionMapper.has(e1) && collisionMapper.has(e2)) {
         CollisionComponent coll1 = collisionMapper.get(e1);
         CollisionComponent coll2 = collisionMapper.get(e2);
-        return coll1.collidableType == CollidableType.HARD ||
-                coll2.collidableType == CollidableType.HARD;
+        return coll1.collidableType == Constants.CollidableType.HARD ||
+                coll2.collidableType == Constants.CollidableType.HARD;
       }
       return false;
   }
