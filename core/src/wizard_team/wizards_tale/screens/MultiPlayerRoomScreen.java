@@ -62,8 +62,10 @@ public class MultiPlayerRoomScreen implements Screen {
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
         rootTable.setDebug(true);
-
-        System.out.println("CONNECTION STATE: " + wp.getConnectionState());
+        //TODO Create game button
+        //TODO MultiPlayerGameScreen
+        //Create/join room
+        wp.joinRoom();
 
         return stage;
     }

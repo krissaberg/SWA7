@@ -42,7 +42,8 @@ public class MainMenuScreen implements Screen {
   public MainMenuScreen(
   		WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
 
-	this.wp = new WarpController();
+  	//TODO Add method for user to decide username
+	this.wp = new WarpController("User13");
 	this.assetManager = assetManager;
 	this.game = game;
 	this.skin = skin;

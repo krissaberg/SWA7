@@ -9,32 +9,33 @@ import wizard_team.wizards_tale.WarpController;
 
 public class RoomListener implements RoomRequestListener{
 
-    private WarpController container;
-    public RoomListener(WarpController container) {
-        this.container = container;
+    private WarpController controller;
+    public RoomListener(WarpController controller) {
+        this.controller = controller;
     }
 
     @Override
     public void onUpdatePropertyDone(LiveRoomInfoEvent roominfo)
     {
-        container.printResponseResult("UpdatePropertyDone "+roominfo.getProperties().size());
+        controller.printResponseResult("UpdatePropertyDone "+roominfo.getProperties().size());
     }
 
     @Override
     public void onLockPropertiesDone(byte bt)
     {
-        container.printResponseResult("LockPropertiesDone "+bt);
+        controller.printResponseResult("LockPropertiesDone "+bt);
     }
 
     @Override
     public void onUnlockPropertiesDone(byte bt)
     {
-        container.printResponseResult("UnlockPropertiesDone "+bt);
+        controller.printResponseResult("UnlockPropertiesDone "+bt);
     }
 
     @Override
     public void onJoinAndSubscribeRoomDone(RoomEvent roomEvent) {
-
+        controller.printResponseResult("Joined and Subscribed");
+        //TODO Add method for creating room if Room is full
     }
 
     @Override
@@ -44,22 +45,22 @@ public class RoomListener implements RoomRequestListener{
 
     @Override
     public void onSubscribeRoomDone(RoomEvent event) {
-        container.printResponseResult("SubscribeRoom "+event.getData().getName());
+        controller.printResponseResult("SubscribeRoom "+event.getData().getName());
     }
 
     @Override
     public void onUnSubscribeRoomDone(RoomEvent event) {
-        container.printResponseResult("UnSubscribeRoom "+event.getData().getName());
+        controller.printResponseResult("UnSubscribeRoom "+event.getData().getName());
     }
 
     @Override
     public void onJoinRoomDone(RoomEvent event) {
-        container.printResponseResult("onJoinRoom "+event.getResult());
+        controller.printResponseResult("onJoinRoom "+event.getResult());
     }
 
     @Override
     public void onLeaveRoomDone(RoomEvent event) {
-        container.printResponseResult("Leave Room "+event.getData().getName());
+        controller.printResponseResult("Leave Room "+event.getData().getName());
     }
 
     @Override
@@ -67,16 +68,17 @@ public class RoomListener implements RoomRequestListener{
         if(event.getResult() == WarpResponseResultCode.SUCCESS){
             String[] users = event.getJoinedUsers();
             String result = "";
-            container.printResponseResult(event.getData().getName()+"(Room Id= " +event.getData().getId()+") Total users "+users.length);
-            //for(int i=0; i<users.length; i++){
-            //    result += " "+users[i];
-            // }
-            // container.appendResponseResult(result);
+            controller.printResponseResult(event.getData().getName()+"(Room Id= " + event.getData().getId()+") Total users "+users.length);
+            for (int i=0; i<users.length; i++) {
+                result += " " + users[i];
+             }
+            controller.printResponseResult(result);
+            //TODO Start game when enough users have joined.
         }
     }
 
     @Override
     public void onSetCustomRoomDataDone(LiveRoomInfoEvent event) {
-        container.printResponseResult("CustomRoomData "+event.getData().getName()+" "+event.getCustomData().toString());
+        controller.printResponseResult("CustomRoomData "+event.getData().getName()+" "+event.getCustomData().toString());
     }
 }
