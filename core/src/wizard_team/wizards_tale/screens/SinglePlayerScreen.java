@@ -26,6 +26,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
+import wizard_team.wizards_tale.components.BoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.CollisionComponent;
@@ -37,6 +38,7 @@ import com.badlogic.gdx.math.MathUtils;
 
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.components.constants.Constants;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
@@ -100,7 +102,7 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new ReceiveInputComponent());
         playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
                 blackMageTex.getWidth(), blackMageTex.getHeight())));
-        playerCharacter.add(new CollisionComponent(CollidableType.SOFT));
+        playerCharacter.add(new CollisionComponent(Constants.CollidableType.SOFT));
         eng.addEntity(playerCharacter);
 
         // Random walkers
@@ -112,7 +114,7 @@ public class SinglePlayerScreen implements Screen {
             walker.add(new VelocityComponent());
             walker.add(new BoundRectComponent(new Rectangle(0, 0,
                     whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollisionComponent(CollidableType.SOFT));
+            walker.add(new CollisionComponent(Constants.CollidableType.SOFT));
             eng.addEntity(walker);
         }
 
@@ -121,8 +123,26 @@ public class SinglePlayerScreen implements Screen {
         wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
         wall.add(new PositionComponent(200, 200));
         wall.add(new SpriteComponent(wallTexture));
-        wall.add(new CollisionComponent(CollidableType.HARD));
+        wall.add(new CollisionComponent(Constants.CollidableType.HARD));
         eng.addEntity(wall);
+
+        // Cells
+        Rectangle rect = new Rectangle(
+                0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
+        for (int x = 0; x<5; x++) {
+            for (int y = 0; y < 5; y++) {
+                Entity tile = new Entity();
+                tile.add(new BoundaryComponent(rect));
+                tile.add(new CellPositionComponent(
+                        (int)(x*Constants.CELL_WIDTH), (int)(y*Constants.CELL_WIDTH)));
+
+                if (x%2 == 0 && y%2 == 0) {
+                    tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
+                } else {tile.add(new CollisionComponent(Constants.CollidableType.HARD));}
+
+            }
+        }
+
 
         // Systems
         eng.addSystem(new RandomWalkerSystem());
