@@ -6,6 +6,6 @@ eclipse.project {
     name = appName + "-core"
 }
 dependencies {
-    compile files('lib/App42MultiPlayerGamingSDK.jar')
-    compile files('lib/json-org.jar')
+    compile files('libs/App42MultiPlayerGamingSDK.jar')
+    compile files('libs/json-org.jar')
 }
