@@ -22,7 +22,7 @@ public class ZoneListener implements ZoneRequestListener {
     @Override
     public void onGetMatchedRoomsDone(MatchedRoomsEvent event)
     {
-        container.appendResponseResult("GetMatchedRooms "+event.getRoomsData().toString());
+        container.printResponseResult("GetMatchedRooms "+event.getRoomsData().toString());
     }
 
     @Override
@@ -42,17 +42,17 @@ public class ZoneListener implements ZoneRequestListener {
 
     @Override
     public void onCreateRoomDone(RoomEvent event) {
-        container.appendResponseResult("onCreateRoom roomname "+event.getData().getName()+" id"+event.getData().getId());
+        container.printResponseResult("onCreateRoom roomname "+event.getData().getName()+" id"+event.getData().getId());
     }
     @Override
     public void onDeleteRoomDone(RoomEvent event) {
-        container.appendResponseResult("DeleteRoom "+event.getData().toString());
+        container.printResponseResult("DeleteRoom "+event.getData().toString());
     }
 
     @Override
     public void onGetAllRoomsDone(AllRoomsEvent event) {
         for(int i=0; i<event.getRoomIds().length; i++){
-            container.appendResponseResult("RoomId "+event.getRoomIds()[i]);
+            container.printResponseResult("RoomId "+event.getRoomIds()[i]);
         }
     }
 
@@ -74,14 +74,14 @@ public class ZoneListener implements ZoneRequestListener {
             else{
                 location = "room id"+event.getLocationId();
             }
-            container.appendResponseResult("User "+event.getName()+" is at " +location);
+            container.printResponseResult("User "+event.getName()+" is at " +location);
         }
     }
 
     @Override
     public void onSetCustomUserDataDone(LiveUserInfoEvent event) {
 
-        container.appendResponseResult("User " +event.getName()+ "says " +event.getCustomData());
+        container.printResponseResult("User " +event.getName()+ "says " +event.getCustomData());
 
     }
 }

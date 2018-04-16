@@ -17,19 +17,19 @@ public class RoomListener implements RoomRequestListener{
     @Override
     public void onUpdatePropertyDone(LiveRoomInfoEvent roominfo)
     {
-        container.appendResponseResult("UpdatePropertyDone "+roominfo.getProperties().size());
+        container.printResponseResult("UpdatePropertyDone "+roominfo.getProperties().size());
     }
 
     @Override
     public void onLockPropertiesDone(byte bt)
     {
-        container.appendResponseResult("LockPropertiesDone "+bt);
+        container.printResponseResult("LockPropertiesDone "+bt);
     }
 
     @Override
     public void onUnlockPropertiesDone(byte bt)
     {
-        container.appendResponseResult("UnlockPropertiesDone "+bt);
+        container.printResponseResult("UnlockPropertiesDone "+bt);
     }
 
     @Override
@@ -44,22 +44,22 @@ public class RoomListener implements RoomRequestListener{
 
     @Override
     public void onSubscribeRoomDone(RoomEvent event) {
-        container.appendResponseResult("SubscribeRoom "+event.getData().getName());
+        container.printResponseResult("SubscribeRoom "+event.getData().getName());
     }
 
     @Override
     public void onUnSubscribeRoomDone(RoomEvent event) {
-        container.appendResponseResult("UnSubscribeRoom "+event.getData().getName());
+        container.printResponseResult("UnSubscribeRoom "+event.getData().getName());
     }
 
     @Override
     public void onJoinRoomDone(RoomEvent event) {
-        container.appendResponseResult("onJoinRoom "+event.getResult());
+        container.printResponseResult("onJoinRoom "+event.getResult());
     }
 
     @Override
     public void onLeaveRoomDone(RoomEvent event) {
-        container.appendResponseResult("Leave Room "+event.getData().getName());
+        container.printResponseResult("Leave Room "+event.getData().getName());
     }
 
     @Override
@@ -67,7 +67,7 @@ public class RoomListener implements RoomRequestListener{
         if(event.getResult() == WarpResponseResultCode.SUCCESS){
             String[] users = event.getJoinedUsers();
             String result = "";
-            container.appendResponseResult(event.getData().getName()+"(Room Id= " +event.getData().getId()+") Total users "+users.length);
+            container.printResponseResult(event.getData().getName()+"(Room Id= " +event.getData().getId()+") Total users "+users.length);
             //for(int i=0; i<users.length; i++){
             //    result += " "+users[i];
             // }
@@ -77,6 +77,6 @@ public class RoomListener implements RoomRequestListener{
 
     @Override
     public void onSetCustomRoomDataDone(LiveRoomInfoEvent event) {
-        container.appendResponseResult("CustomRoomData "+event.getData().getName()+" "+event.getCustomData().toString());
+        container.printResponseResult("CustomRoomData "+event.getData().getName()+" "+event.getCustomData().toString());
     }
 }

@@ -5,14 +5,14 @@ import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultC
 import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
 
-/*
 import wizard_team.wizards_tale.listeners.ConnectionListener;
+/*
 import wizard_team.wizards_tale.listeners.RoomListener;
 import wizard_team.wizards_tale.listeners.ZoneListener;
 import wizard_team.wizards_tale.listeners.NotificationListener;
 */
 
-public class WarpController implements ConnectionRequestListener{
+public class WarpController {
     private static String apiKey = "60f7fa6993f2adba097dd817d851bd3a901717ed7af1d034ad435379fc329d0a";
     private static String secretKey = "8d20fbbc76dfe8f4928dcad155b162738c76e54d1eda3e31c92b24c3e6dd65fd";
 
@@ -20,7 +20,7 @@ public class WarpController implements ConnectionRequestListener{
     // 2110110260
     public WarpController() {
         initAppWarp();
-        warpClient.addConnectionRequestListener(this);
+        warpClient.addConnectionRequestListener(new ConnectionListener(this));
         warpClient.connectWithUserName("user");
 
         /*
@@ -42,9 +42,10 @@ public class WarpController implements ConnectionRequestListener{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        warpClient.addConnectionRequestListener(this);
+        //warpClient.addConnectionRequestListener(new Cthis);
     }
 
+                /*
     public void onConnectDone(final ConnectEvent event) {
         System.out.println("OnConnectDone" + " " + event.getResult());
             if(event.getResult()== WarpResponseResultCode.SUCCESS){
@@ -53,36 +54,25 @@ public class WarpController implements ConnectionRequestListener{
             }else{
                 System.out.println("FAILED");
             }
-                /*
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
             }
         });
+    }
             */
-    }
-
-    @Override
-    public void onDisconnectDone(ConnectEvent connectEvent) {
-
-    }
-
-    @Override
-    public void onInitUDPDone(byte b) {
-
-    }
 
 
     public void appendLeaveNotifyResult(String s) {
-        System.out.println("[APP] " + s);
+        System.out.println(s);
     }
 
     public void appendNotifyResult(String s) {
-        System.out.println("[APP] " + s);
+        System.out.println(s);
     }
 
-    public void appendResponseResult(String s) {
-        System.out.println("[APP]  " + s);
+    public void printResponseResult(String s) {
+        System.out.println(s);
     }
 
     public WarpClient getClient() {

@@ -11,12 +11,12 @@ import wizard_team.wizards_tale.WarpController;
 
 public class ConnectionListener implements ConnectionRequestListener{
 
-    WarpController container;
-    Timer recoverTimer;
-    int NumberOfRecoverAttemtps=0;
-    RecoverConnectionTask connectionTask;
+    private WarpController controller;
+    private Timer recoverTimer;
+    private int NumberOfRecoverAttempts=0;
+
     public ConnectionListener(WarpController owner) {
-        this.container = owner;
+        this.controller = owner;
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ConnectionListener implements ConnectionRequestListener{
             default:break;
 
         }
-        container.appendResponseResult("onConnectDone " + message);
+        controller.printResponseResult("onConnectDone " + message);
     }
 
     private void RecoverConnection()
@@ -56,21 +56,20 @@ public class ConnectionListener implements ConnectionRequestListener{
         if(recoverTimer==null)
         {
             recoverTimer = new Timer();
-            connectionTask = new ConnectionListener.RecoverConnectionTask(this);
+            RecoverConnectionTask connectionTask = new RecoverConnectionTask(this);
             recoverTimer.scheduleAtFixedRate(connectionTask,6000,6000);
         }
     }
 
 
     @Override
-    public void onInitUDPDone(byte b)
-    {
-        container.appendResponseResult("Init Udp" + b);
+    public void onInitUDPDone(byte b) {
+        controller.printResponseResult("Init Udp" + b);
     }
 
     @Override
     public void onDisconnectDone(ConnectEvent event) {
-        container.appendResponseResult("onDisconnectDone " + event.getResult());
+        controller.printResponseResult("onDisconnectDone " + event.getResult());
     }
 
     private class RecoverConnectionTask extends TimerTask {
@@ -78,23 +77,23 @@ public class ConnectionListener implements ConnectionRequestListener{
         ConnectionListener owner;
         RecoverConnectionTask(ConnectionListener conn) {
             owner = conn;
-            owner.NumberOfRecoverAttemtps=0;
+            owner.NumberOfRecoverAttempts = 0;
         }
 
         @Override
         public void run() {
-            container.appendResponseResult("In Run Method");
-            if (owner.NumberOfRecoverAttemtps > 10) {
-                owner.NumberOfRecoverAttemtps=0;
+            controller.printResponseResult("In Run Method");
+            if (owner.NumberOfRecoverAttempts > 10) {
+                owner.NumberOfRecoverAttempts = 0;
                 owner.recoverTimer.cancel();
-                owner.recoverTimer=null;
+                owner.recoverTimer = null;
                 return;
             }
             try {
-                owner.NumberOfRecoverAttemtps++;
+                owner.NumberOfRecoverAttempts++;
                 WarpClient.getInstance().RecoverConnection();
             } catch (Exception e) {
-                container.appendResponseResult("Exception " + e.getMessage());
+                controller.printResponseResult("Exception " + e.getMessage());
             }
         }
     }
