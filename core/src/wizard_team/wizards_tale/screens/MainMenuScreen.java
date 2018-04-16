@@ -92,6 +92,15 @@ public class MainMenuScreen implements Screen {
               }
             });
 
+    TextButton onlineGameButton = new TextButton("Online Game", skin);
+    rootTable.add(onlineGameButton);
+    onlineGameButton.addListener(new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        game.setScreen(new MPLoginScreen(game));
+      }
+    });
+
     Button startButton = new TextButton("New Game", skin);
     rootTable.add(startButton);
     startButton.addListener(

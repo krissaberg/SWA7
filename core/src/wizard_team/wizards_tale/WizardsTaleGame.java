@@ -7,14 +7,17 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
+import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
 import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListener;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Properties;
 
+import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTChatRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTLobbyRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTNotificationListener;
@@ -22,6 +25,7 @@ import wizard_team.wizards_tale.appwarp_listeners.WTRoomRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTUpdateRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTZoneRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTConnectionListener;
+import wizard_team.wizards_tale.screens.MPLobbyScreen;
 import wizard_team.wizards_tale.screens.MainMenuScreen;
 
 public class WizardsTaleGame extends Game {
@@ -31,6 +35,17 @@ public class WizardsTaleGame extends Game {
     public WarpClient warpClient;
     public String username = "";
     private Properties gameProperties = new Properties();
+    private ArrayList<String> consoleMessages = new ArrayList<String>();
+
+    public final WTConnectionListener connectionEventListener = new WTConnectionListener();
+
+    public void addConsoleMsg(String s) {
+        consoleMessages.add(s);
+    }
+
+    public ArrayList<String> getConsoleMessages() {
+        return consoleMessages;
+    }
 
     @Override
     public void create() {
@@ -77,19 +92,23 @@ public class WizardsTaleGame extends Game {
         }
 
         // Then, actually initialize the WarpClient.
+        System.out.println("Initializing WarpClient");
         WarpClient.initialize(
                 gameProperties.getProperty("api_key"),
                 gameProperties.getProperty("secret_key")
         );
+        System.out.println("Done initializing WarpClient");
         try {
             warpClient = WarpClient.getInstance();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+        System.out.println(warpClient.getConnectionState());
+
         // Add event callbacks to the WarpClient
         warpClient.addChatRequestListener(new WTChatRequestListener());
-        warpClient.addConnectionRequestListener(new WTConnectionListener());
+        warpClient.addConnectionRequestListener(connectionEventListener);
         warpClient.addLobbyRequestListener(new WTLobbyRequestListener());
         warpClient.addNotificationListener(new WTNotificationListener());
         warpClient.addRoomRequestListener(new WTRoomRequestListener());
@@ -97,6 +116,7 @@ public class WizardsTaleGame extends Game {
         warpClient.addZoneRequestListener(new WTZoneRequestListener());
 
         setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
+//        setScreen(new MPLobbyScreen(this));
     }
 
     @Override
@@ -124,5 +144,9 @@ public class WizardsTaleGame extends Game {
 
     public Skin getSkin() {
         return skin;
+    }
+
+    public WarpClient getWarpClient() {
+        return warpClient;
     }
 }
