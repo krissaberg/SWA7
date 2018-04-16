@@ -72,7 +72,6 @@ public class MainMenuScreen implements Screen {
                   @Override
                   public void clicked(InputEvent event, float x, float y) {
                       WarpController wp = new WarpController();
-                      wp.getClient();
                   }
               });
 
