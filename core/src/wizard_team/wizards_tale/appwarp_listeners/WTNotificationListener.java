@@ -1,5 +1,6 @@
 package wizard_team.wizards_tale.appwarp_listeners;
 
+import com.badlogic.gdx.Gdx;
 import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LobbyData;
 import com.shephertz.app42.gaming.multiplayer.client.events.MoveEvent;
@@ -13,6 +14,8 @@ import java.util.Observable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class WTNotificationListener extends Observable implements NotifyListener {
+    public static final String tag = "NotificationListener";
+
     @Override
     public void onRoomCreated(RoomData roomData) {
         throw new NotImplementedException();
@@ -30,7 +33,8 @@ public class WTNotificationListener extends Observable implements NotifyListener
 
     @Override
     public void onUserJoinedRoom(RoomData roomData, String s) {
-        throw new NotImplementedException();
+        setChanged();
+        notifyObservers(roomData);
     }
 
     @Override

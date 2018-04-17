@@ -30,12 +30,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
-import wizard_team.wizards_tale.appwarp_listeners.EventType;
-import wizard_team.wizards_tale.appwarp_listeners.EventWrapper;
 
-public class MPRoomSelect implements Screen, Observer {
+public class MPRoom implements Screen, Observer {
     private WizardsTaleGame game;
-    private final String username;
+    private final RoomData roomData;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
     private Skin skin;
@@ -47,17 +45,13 @@ public class MPRoomSelect implements Screen, Observer {
     private Label messagesLabel;
     private Array rooms = new Array();
     private List roomList;
-    private static final int updatePeriod = 5;
-    private float updateTimer = updatePeriod;
+    private float updateTimer = 2;
     private boolean enterRoom = false;
-    private RoomData roomData;
-    private final String tag = "RoomSelect";
 
-    public MPRoomSelect(WizardsTaleGame game, String username) {
+    public MPRoom(WizardsTaleGame game, RoomData roomData) {
         this.game = game;
-        this.username = username;
+        this.roomData = roomData;
         game.awListeners.zoneRequestListener.addObserver(this);
-        game.awListeners.roomRequestListener.addObserver(this);
         spriteBatch = game.getSpriteBatch();
         assetManager = game.getAssetManager();
         skin = game.getSkin();
@@ -67,11 +61,6 @@ public class MPRoomSelect implements Screen, Observer {
         stage = createStage(viewport);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
-        updateRoomList();
-    }
-
-    private void updateRoomList() {
-        warpClient.getAllRooms();
     }
 
     private Stage createStage(Viewport viewport) {
@@ -82,39 +71,20 @@ public class MPRoomSelect implements Screen, Observer {
         rootTable.setFillParent(true);
         rootTable.setDebug(true);
 
-        final TextField newRoomName = new TextField("New room name", skin);
-        rootTable.add(newRoomName);
-
-        TextButton newRoomButton = new TextButton("New room", skin);
-        rootTable.add(newRoomButton);
-        newRoomButton.addListener(new ClickListener() {
+        TextButton backButton = new TextButton("Back", skin);
+        rootTable.add(backButton);
+        backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                HashMap<String, Object> roomProps = new HashMap<String, Object>();
-                warpClient.createRoom(
-                        newRoomName.getText(),
-                        username,
-                        4,
-                         roomProps
-                );
+                game.popScreen();
             }
         });
 
-        rootTable.row();
+        Label title = new Label("Game Room: ", skin);
+        rootTable.add(title).top();
 
-        roomList = new List(skin);
-        roomList.setItems(rooms);
-        rootTable.add(roomList).expandX().expandY().left().top();
-
-        TextButton joinRoomButton = new TextButton("Join room", skin);
-        rootTable.add(joinRoomButton);
-        joinRoomButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.log(tag, "Joining room " + roomList.getSelected());
-                warpClient.joinAndSubscribeRoom((String) roomList.getSelected());
-            }
-        });
+        Label roomTitle = new Label(roomData.getName(), skin);
+        rootTable.add(roomTitle);
 
         return stage;
     }
@@ -122,24 +92,12 @@ public class MPRoomSelect implements Screen, Observer {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(this.stage);
-        updateRoomList();
     }
 
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        updateTimer -= delta;
-        if(updateTimer < 0) {
-            updateRoomList();
-            updateTimer = updatePeriod;
-        }
-
-        if(enterRoom) {
-            enterRoom = false;
-            game.setScreen(new MPRoom(game, roomData));
-        }
 
         stage.act(delta);
         stage.draw();
@@ -173,41 +131,8 @@ public class MPRoomSelect implements Screen, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if(o instanceof AllRoomsEvent) {
-            AllRoomsEvent e = (AllRoomsEvent) o;
-            if (e.getRoomIds() != null) {
-                rooms = new Array(e.getRoomIds());
-                rooms.sort();
-                roomList.setItems(rooms);
-            }
-        }
-
-        else if(o instanceof RoomEvent) {
-            RoomEvent e = (RoomEvent) o;
-            String tag = "RoomEvent";
-            Gdx.app.log(tag, e.toString());
-            Gdx.app.log(tag, e.getData().toString());
-        }
-
-        else if(o instanceof RoomData) {
-            Gdx.app.log(tag, "Joining room");
-            RoomData d = (RoomData) o;
-            roomData = d;
-            enterRoom = true;
-        }
-
-        else if(o instanceof EventWrapper) {
-            EventWrapper wrapper = (EventWrapper) o;
-            EventType type = wrapper.type;
-            Object event = wrapper.event;
-            switch(type) {
-                case JOIN_AND_SUBSCRIBE:
-                    RoomEvent e = (RoomEvent) event;
-                    roomData = e.getData();
-                    enterRoom = true;
-                    break;
-            }
-        }
+        String tag = "MPRoom";
+        Gdx.app.log(tag, o.toString());
     }
 }
 

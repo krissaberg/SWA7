@@ -21,25 +21,19 @@ public class WTZoneRequestListener extends Observable implements ZoneRequestList
 
     @Override
     public void onGetAllRoomsDone(AllRoomsEvent allRoomsEvent) {
-        Gdx.app.log("ROOMS", "onGetAllRoomsDone");
         setChanged();
         notifyObservers(allRoomsEvent);
     }
 
     @Override
     public void onCreateRoomDone(RoomEvent roomEvent) {
-        System.out.println("Room created");
-        System.out.println(roomEvent.getResult());
+        setChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onGetOnlineUsersDone(AllUsersEvent allUsersEvent) {
-        if(allUsersEvent.getResult() == WarpResponseResultCode.SUCCESS) {
-            System.out.println("Got online users");
-            for (String s : allUsersEvent.getUserNames()) {
-                System.out.println(s);
-            }
-        }
+        throw new NotImplementedException();
     }
 
     @Override
@@ -59,7 +53,7 @@ public class WTZoneRequestListener extends Observable implements ZoneRequestList
 
     @Override
     public void onGetAllRoomsCountDone(AllRoomsEvent allRoomsEvent) {
-        hasChanged();
+        setChanged();
         notifyObservers(allRoomsEvent);
     }
 

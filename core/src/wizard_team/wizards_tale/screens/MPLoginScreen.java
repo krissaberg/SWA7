@@ -40,6 +40,7 @@ public class MPLoginScreen implements Screen, Observer {
     private boolean isConnecting = false;
     private boolean connectionFailed = false;
     private Label errorLabel;
+    private TextField usernameArea;
 
     MPLoginScreen(WizardsTaleGame game) {
         this.game = game;
@@ -71,7 +72,7 @@ public class MPLoginScreen implements Screen, Observer {
         Table signInRow = new Table();
         rootTable.add(signInRow);
 
-        final TextField usernameArea = new TextArea("Bob", skin);
+        usernameArea = new TextArea("Bob", skin);
         signInRow.add(usernameArea);
 
         final TextButton loginButton = new TextButton("Sign in", skin);
@@ -109,7 +110,7 @@ public class MPLoginScreen implements Screen, Observer {
         stage.draw();
 
         if (isConnected) {
-            game.setScreen(new MPRoomSelect(game));
+            game.setScreen(new MPRoomSelect(game, usernameArea.getText()));
         }
     }
 

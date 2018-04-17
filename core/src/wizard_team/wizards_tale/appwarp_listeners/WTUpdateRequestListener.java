@@ -1,5 +1,6 @@
 package wizard_team.wizards_tale.appwarp_listeners;
 
+import com.badlogic.gdx.Gdx;
 import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListener;
 
 import java.util.Observable;
@@ -7,13 +8,15 @@ import java.util.Observable;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class WTUpdateRequestListener extends Observable implements UpdateRequestListener {
+    public static final String tag = "UpdReqList";
+
     @Override
     public void onSendUpdateDone(byte b) {
-        throw new NotImplementedException();
+        Gdx.app.log(tag, String.valueOf(b));
     }
 
     @Override
     public void onSendPrivateUpdateDone(byte b) {
-        throw new NotImplementedException();
+        Gdx.app.log(tag, String.valueOf(b));
     }
 }

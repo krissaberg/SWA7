@@ -2,6 +2,7 @@ package wizard_team.wizards_tale;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
@@ -12,6 +13,7 @@ import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Stack;
 
 import wizard_team.wizards_tale.screens.MainMenuScreen;
 
@@ -27,6 +29,20 @@ public class WizardsTaleGame extends Game {
     public void addConsoleMsg(String s) {
         consoleMessages.add(s);
     }
+    private Stack<Screen> screenStack = new Stack<Screen>();
+
+    @Override
+    public void setScreen(Screen screen) {
+        super.setScreen(screen);
+        screenStack.push(screen);
+    }
+
+    public void popScreen() {
+        Screen prevScreen = screenStack.pop();
+        prevScreen.dispose();
+        super.setScreen(screenStack.peek());
+    }
+
     public ArrayList<String> getConsoleMessages() {
         return consoleMessages;
     }
