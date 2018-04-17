@@ -46,7 +46,7 @@ public class MPLoginScreen implements Screen, ConnectionEventListener {
         stage = createStage(viewport);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
-        game.connectionEventListener.registerObserver(this);
+        game.awListeners.connectionListener.registerObserver(this);
     }
 
     private Stage createStage(Viewport viewport) {

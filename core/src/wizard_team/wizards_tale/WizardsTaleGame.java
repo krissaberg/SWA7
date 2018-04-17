@@ -1,31 +1,18 @@
 package wizard_team.wizards_tale;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
-import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
-import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
-import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListener;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Properties;
 
-import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTChatRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTLobbyRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTNotificationListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTRoomRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTUpdateRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTZoneRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTConnectionListener;
-import wizard_team.wizards_tale.screens.MPLobbyScreen;
 import wizard_team.wizards_tale.screens.MainMenuScreen;
 
 public class WizardsTaleGame extends Game {
@@ -34,15 +21,12 @@ public class WizardsTaleGame extends Game {
     private Skin skin;
     public WarpClient warpClient;
     public String username = "";
-    private Properties gameProperties = new Properties();
-    private ArrayList<String> consoleMessages = new ArrayList<String>();
-
-    public final WTConnectionListener connectionEventListener = new WTConnectionListener();
-
+    private final Properties gameProperties = new Properties();
+    private final ArrayList<String> consoleMessages = new ArrayList<String>();
+    public final AWListeners awListeners = new AWListeners();
     public void addConsoleMsg(String s) {
         consoleMessages.add(s);
     }
-
     public ArrayList<String> getConsoleMessages() {
         return consoleMessages;
     }
@@ -60,38 +44,14 @@ public class WizardsTaleGame extends Game {
         assetManager.finishLoading();
         skin = assetManager.get("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
-        // Set up AppWarp (online multiplayer). First, load API and private keys from file:
-        FileInputStream in;
+        // Get WarpClient API keys
+        FileHandle gamePropFile = Gdx.files.internal("game.properties");
         try {
-            in = new FileInputStream("game.properties");
-            gameProperties.load(in);
-            in.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("File 'game.properties' not found in assets folder.");
-            System.out.println("Creating placeholder file. You have to update it with the AppWarp keys!");
-
-            Properties placeholderProperties = new Properties();
-            placeholderProperties.setProperty("api_key", "Put the AppWarp API key here");
-            placeholderProperties.setProperty("secret_key", "Put the AppWarp secret key here");
-
-            try {
-                FileOutputStream out = new FileOutputStream("game.properties");
-                placeholderProperties.store(out,
-                        "Placeholder game configuration file");
-                out.close();
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-
-            e.printStackTrace();
-            System.exit(2);
+            gameProperties.load(gamePropFile.reader());
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        // Then, actually initialize the WarpClient.
+        // Initialize the WarpClient
         System.out.println("Initializing WarpClient");
         WarpClient.initialize(
                 gameProperties.getProperty("api_key"),
@@ -104,28 +64,17 @@ public class WizardsTaleGame extends Game {
             e.printStackTrace();
         }
 
-        System.out.println(warpClient.getConnectionState());
-
         // Add event callbacks to the WarpClient
-        warpClient.addChatRequestListener(new WTChatRequestListener());
-        warpClient.addConnectionRequestListener(connectionEventListener);
-        warpClient.addLobbyRequestListener(new WTLobbyRequestListener());
-        warpClient.addNotificationListener(new WTNotificationListener());
-        warpClient.addRoomRequestListener(new WTRoomRequestListener());
-        warpClient.addUpdateRequestListener(new WTUpdateRequestListener());
-        warpClient.addZoneRequestListener(new WTZoneRequestListener());
+        warpClient.addChatRequestListener(awListeners.chatRequestListener);
+        warpClient.addConnectionRequestListener(awListeners.connectionListener);
+        warpClient.addLobbyRequestListener(awListeners.lobbyRequestListener);
+        warpClient.addNotificationListener(awListeners.notificationListener);
+        warpClient.addRoomRequestListener(awListeners.roomRequestListener);
+        warpClient.addUpdateRequestListener(awListeners.updateRequestListener);
+        warpClient.addZoneRequestListener(awListeners.zoneRequestListener);
 
         setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
 //        setScreen(new MPLobbyScreen(this));
-    }
-
-    @Override
-    public void render() {
-        super.render();
-        // Gdx.gl.glClearColor(1, 0, 0, 1);
-        // Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        // spriteBatch.begin();
-        // spriteBatch.end();
     }
 
     @Override
