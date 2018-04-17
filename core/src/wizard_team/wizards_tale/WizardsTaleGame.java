@@ -74,7 +74,7 @@ public class WizardsTaleGame extends Game {
         warpClient.addZoneRequestListener(awListeners.zoneRequestListener);
 
         setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
-//        setScreen(new MPLobbyScreen(this));
+//        setScreen(new MPRoomSelect(this));
     }
 
     @Override
