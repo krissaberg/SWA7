@@ -8,10 +8,11 @@ import com.shephertz.app42.gaming.multiplayer.client.events.UpdateEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.NotifyListener;
 
 import java.util.HashMap;
+import java.util.Observable;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class WTNotificationListener implements NotifyListener {
+public class WTNotificationListener extends Observable implements NotifyListener {
     @Override
     public void onRoomCreated(RoomData roomData) {
         throw new NotImplementedException();

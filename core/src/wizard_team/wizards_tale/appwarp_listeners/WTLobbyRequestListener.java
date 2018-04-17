@@ -4,9 +4,11 @@ import com.shephertz.app42.gaming.multiplayer.client.events.LiveRoomInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LobbyEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.LobbyRequestListener;
 
+import java.util.Observable;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class WTLobbyRequestListener implements LobbyRequestListener {
+public class WTLobbyRequestListener extends Observable implements LobbyRequestListener {
     @Override
     public void onJoinLobbyDone(LobbyEvent lobbyEvent) {
         throw new NotImplementedException();
