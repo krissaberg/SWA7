@@ -1,7 +1,7 @@
 package wizard_team.wizards_tale;
 
 import wizard_team.wizards_tale.appwarp_listeners.WTChatRequestListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTConnectionListener;
+import wizard_team.wizards_tale.appwarp_listeners.WTConnectionRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTLobbyRequestListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTNotificationListener;
 import wizard_team.wizards_tale.appwarp_listeners.WTRoomRequestListener;
@@ -10,7 +10,7 @@ import wizard_team.wizards_tale.appwarp_listeners.WTZoneRequestListener;
 
 public class AWListeners {
     public final WTChatRequestListener chatRequestListener;
-    public final WTConnectionListener connectionListener;
+    public final WTConnectionRequestListener connectionListener;
     public final WTLobbyRequestListener lobbyRequestListener;
     public final WTNotificationListener notificationListener;
     public final WTRoomRequestListener roomRequestListener;
@@ -19,7 +19,7 @@ public class AWListeners {
 
     public AWListeners() {
         this.chatRequestListener = new WTChatRequestListener();
-        this.connectionListener = new WTConnectionListener();
+        this.connectionListener = new WTConnectionRequestListener();
         this.lobbyRequestListener = new WTLobbyRequestListener();
         this.notificationListener = new WTNotificationListener();
         this.roomRequestListener = new WTRoomRequestListener();

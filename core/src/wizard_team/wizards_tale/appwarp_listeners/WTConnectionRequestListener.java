@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class WTConnectionListener implements ConnectionRequestListener {
+public class WTConnectionRequestListener implements ConnectionRequestListener {
     private ArrayList<ConnectionEventListener> observers = new ArrayList<ConnectionEventListener>();
 
     public void registerObserver(ConnectionEventListener observer) {
@@ -28,36 +28,12 @@ public class WTConnectionListener implements ConnectionRequestListener {
 
     @Override
     public void onConnectDone(ConnectEvent connectEvent) {
-//        switch (connectEvent.getResult()) {
-//            case WarpResponseResultCode.SUCCESS:
-//                System.out.println("Successfully connected");
-//                break;
-//            case WarpResponseResultCode.AUTH_ERROR:
-//                System.out.println("Auth error");
-//                break;
-//            case WarpResponseResultCode.AUTO_RECOVERING:
-//                System.out.println("Auto recovering");
-//                break;
-//            case WarpResponseResultCode.BAD_REQUEST:
-//                System.out.println("Bad request");
-//                break;
-//            case WarpResponseResultCode.CONNECTION_ERROR:
-//                System.out.println("Connection error");
-//                break;
-//            default:
-//                System.out.println("Other error: " + connectEvent.getResult());
-//        }
         notify(connectEvent);
     }
 
     @Override
     public void onDisconnectDone(ConnectEvent connectEvent) {
-        if(connectEvent.getResult() == WarpResponseResultCode.SUCCESS) {
-            System.out.println("Successfully disconnected");
-        } else {
-            System.out.print("Disconnection error. Error code: ");
-            System.out.println(connectEvent.getResult());
-        }
+        notify(connectEvent);
     }
 
     @Override
