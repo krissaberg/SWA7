@@ -21,10 +21,14 @@ import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
+import wizard_team.wizards_tale.appwarp_listeners.WTConnectionRequestListener;
 
-public class MPLoginScreen implements Screen, ConnectionEventListener {
+public class MPLoginScreen implements Screen, ConnectionEventListener, Observer {
     private WizardsTaleGame game;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
@@ -46,7 +50,7 @@ public class MPLoginScreen implements Screen, ConnectionEventListener {
         stage = createStage(viewport);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
-        game.awListeners.connectionListener.registerObserver(this);
+        game.awListeners.connectionListener.addObserver(this);
     }
 
     private Stage createStage(Viewport viewport) {
@@ -117,6 +121,17 @@ public class MPLoginScreen implements Screen, ConnectionEventListener {
 
     @Override
     public void handle(ConnectEvent event) {
+        if (event.getResult() == WarpResponseResultCode.SUCCESS) {
+            System.out.println("Connection succeeded");
+            isConnected = true;
+        } else {
+            System.out.println("Connection failed");
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        ConnectEvent event = (ConnectEvent) o;
         if (event.getResult() == WarpResponseResultCode.SUCCESS) {
             System.out.println("Connection succeeded");
             isConnected = true;

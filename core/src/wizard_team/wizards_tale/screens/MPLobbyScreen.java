@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
 
-public class MPLobbyScreen implements Screen, ConnectionEventListener {
+public class MPLobbyScreen implements Screen {
     private WizardsTaleGame game;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
@@ -133,8 +133,5 @@ public class MPLobbyScreen implements Screen, ConnectionEventListener {
 
     }
 
-    public void handle(ConnectEvent event) {
-        System.out.println("yay an event!");
-    }
 }
 
