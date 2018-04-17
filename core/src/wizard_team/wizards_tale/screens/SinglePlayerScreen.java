@@ -5,13 +5,11 @@ import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -21,13 +19,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
-import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
+import wizard_team.wizards_tale.components.CollidableType;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
@@ -37,11 +37,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
-import wizard_team.wizards_tale.components.constants.Constants;
-import wizard_team.wizards_tale.systems.BombRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
-import wizard_team.wizards_tale.systems.CellDebugRenderSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -58,13 +55,10 @@ public class SinglePlayerScreen implements Screen {
 
     private Engine engine;
     private Touchpad touchpad;
-    private Button bombButton;
 
     private Texture whiteMageTex;
     private Texture blackMageTex;
     private Texture wallTexture;
-    private Texture bombTexture;
-    private InputSystem inputSystem;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -82,12 +76,10 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/black_mage.png", Texture.class);
         assetManager.load("sprites/white_mage.png", Texture.class);
         assetManager.load("sprites/mountain.png", Texture.class);
-        assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.finishLoading();
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
         whiteMageTex = assetManager.get("sprites/white_mage.png", Texture.class);
         wallTexture = assetManager.get("sprites/mountain.png", Texture.class);
-        bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -99,7 +91,7 @@ public class SinglePlayerScreen implements Screen {
         // Player character entity
         Entity playerCharacter = new Entity();
 
-        //Positions
+            //Positions
         playerCharacter.add(new PositionComponent(100, 200));
         playerCharacter.add(new CellPositionComponent(0,0));
 
@@ -108,7 +100,7 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new ReceiveInputComponent());
         playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
                 blackMageTex.getWidth(), blackMageTex.getHeight())));
-        playerCharacter.add(new CollisionComponent(Constants.CollidableType.SOFT));
+        playerCharacter.add(new CollisionComponent(CollidableType.SOFT));
         eng.addEntity(playerCharacter);
 
         // Random walkers
@@ -120,7 +112,7 @@ public class SinglePlayerScreen implements Screen {
             walker.add(new VelocityComponent());
             walker.add(new BoundRectComponent(new Rectangle(0, 0,
                     whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollisionComponent(Constants.CollidableType.SOFT));
+            walker.add(new CollisionComponent(CollidableType.SOFT));
             eng.addEntity(walker);
         }
 
@@ -129,40 +121,18 @@ public class SinglePlayerScreen implements Screen {
         wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
         wall.add(new PositionComponent(200, 200));
         wall.add(new SpriteComponent(wallTexture));
-        wall.add(new CollisionComponent(Constants.CollidableType.HARD));
+        wall.add(new CollisionComponent(CollidableType.HARD));
         eng.addEntity(wall);
-
-        // Cells
-        Rectangle rect = new Rectangle(
-                0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
-        for (int x = 0; x<5; x++) {
-            for (int y = 0; y < 5; y++) {
-                Entity tile = new Entity();
-                tile.add(new CellBoundaryComponent(rect));
-                tile.add(new CellPositionComponent(
-                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_WIDTH)));
-
-                if (x % 2 == 0 && y % 2 == 0) {
-                    tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
-                } else {
-                    tile.add(new CollisionComponent(Constants.CollidableType.HARD));
-                }
-                eng.addEntity(tile);
-            }
-        }
-
 
         // Systems
         eng.addSystem(new RandomWalkerSystem());
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
-        inputSystem = new InputSystem(touchpad, bombButton);
-        eng.addSystem(inputSystem);
+        eng.addSystem(new InputSystem(touchpad));
 
         eng.addSystem(new CellPositionSystem());
         eng.addSystem(new CellRenderSystem(spriteBatch));
-        eng.addSystem(new CellDebugRenderSystem(spriteBatch));
-        eng.addSystem(new BombRenderSystem(spriteBatch, bombTexture));
+
 
         return eng;
     }
@@ -179,17 +149,11 @@ public class SinglePlayerScreen implements Screen {
         Touchpad touchpad = new Touchpad(15, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
+
         rootTable.add(new Table()).expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
-        this.bombButton = bombButton;
         rootTable.add(bombButton).bottom().right();
-        this.bombButton.addListener(new ChangeListener() {
-            @Override
-            public void changed (ChangeEvent event, Actor actor) {
-                inputSystem.setBombButtonPressed();
-            }
-        });
 
         return stage;
     }
