@@ -13,7 +13,7 @@ import wizard_team.wizards_tale.components.CellPositionComponent;
 //import wizard_team.wizards_tale.components.SpriteComponent;
 
 //TODO: implment sprite
-public class DebugRenderSystem extends IteratingSystem {
+public class CellDebugRenderSystem extends IteratingSystem {
   private ComponentMapper<CellPositionComponent> posMapper =
           ComponentMapper.getFor(CellPositionComponent.class);
 
@@ -24,7 +24,7 @@ public class DebugRenderSystem extends IteratingSystem {
   private SpriteBatch batch;
   private ShapeRenderer shapeRenderer;
 
-  public DebugRenderSystem(SpriteBatch batch) {
+  public CellDebugRenderSystem(SpriteBatch batch) {
     super(Family.all(CellPositionComponent.class, CellBoundaryComponent.class).get());
     this.batch = batch;
     shapeRenderer = new ShapeRenderer();

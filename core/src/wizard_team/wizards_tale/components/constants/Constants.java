@@ -11,6 +11,8 @@ public class Constants {
     public static final float CELL_HEIGHT = 100f;
     public static final float CELL_WIDTH = 100f;
 
+    public static final int DEFAULT_DETONATION_TIME = 10;
+
     //This is a testing dimension, but allows for a 4 hard blocks
     public static final int MAP_X = 5;
     public static final int MAP_Y = 5;
@@ -25,6 +27,8 @@ public class Constants {
     //TODO: for testing only, remove
     public static final int SCREEN_X  = 800;
     public static final int SCREEN_Y = 600;
+    public static final int DEFAULT_BOMB_DAMAGE = 1;
+
 
     public enum EffectTypes {SPREAD, VANISH};
 
