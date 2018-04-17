@@ -9,6 +9,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
@@ -25,10 +27,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
-import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
-import wizard_team.wizards_tale.appwarp_listeners.WTConnectionRequestListener;
 
-public class MPLoginScreen implements Screen, ConnectionEventListener, Observer {
+public class MPLoginScreen implements Screen, Observer {
     private WizardsTaleGame game;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
@@ -38,6 +38,9 @@ public class MPLoginScreen implements Screen, ConnectionEventListener, Observer 
     private String consoleStr = "";
     private WarpClient warpClient;
     private boolean isConnected = false;
+    private boolean isConnecting = false;
+    private boolean connectionFailed = false;
+    private Label errorLabel;
 
     MPLoginScreen(WizardsTaleGame game) {
         this.game = game;
@@ -60,19 +63,35 @@ public class MPLoginScreen implements Screen, ConnectionEventListener, Observer 
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
         rootTable.setDebug(true);
+        rootTable.top();
+
+        Label title = new Label("Sign in", skin);
+        rootTable.add(title).top();
+        rootTable.row();
+
+        Table signInRow = new Table();
+        rootTable.add(signInRow);
 
         final TextField usernameArea = new TextArea("Bob", skin);
-        rootTable.add(usernameArea);
+        signInRow.add(usernameArea);
 
-        TextButton loginButton = new TextButton("Sign in", skin);
-        rootTable.add(loginButton);
+        final TextButton loginButton = new TextButton("Sign in", skin);
+        signInRow.add(loginButton);
         loginButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                System.out.println("Trying to log in as " + usernameArea.getText());
-                warpClient.connectWithUserName(usernameArea.getText());
+                if (!isConnecting) {
+                    isConnecting = true;
+                    System.out.println("Trying to log in as " + usernameArea.getText());
+                    warpClient.connectWithUserName(usernameArea.getText());
+                    errorLabel.setText("Connecting...");
+                }
             }
         });
+
+        errorLabel = new Label("", skin);
+        rootTable.row();
+        rootTable.add(errorLabel).center();
 
         return stage;
     }
@@ -84,10 +103,12 @@ public class MPLoginScreen implements Screen, ConnectionEventListener, Observer 
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0, 0, 1);
+        Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
         stage.act(delta);
         stage.draw();
+
         if (isConnected) {
             game.setScreen(new MPLobbyScreen(game));
         }
@@ -120,23 +141,17 @@ public class MPLoginScreen implements Screen, ConnectionEventListener, Observer 
     }
 
     @Override
-    public void handle(ConnectEvent event) {
-        if (event.getResult() == WarpResponseResultCode.SUCCESS) {
-            System.out.println("Connection succeeded");
-            isConnected = true;
-        } else {
-            System.out.println("Connection failed");
-        }
-    }
-
-    @Override
     public void update(Observable observable, Object o) {
         ConnectEvent event = (ConnectEvent) o;
+        isConnecting = false;
         if (event.getResult() == WarpResponseResultCode.SUCCESS) {
             System.out.println("Connection succeeded");
             isConnected = true;
+            errorLabel.setText("Connection succeeded.");
         } else {
             System.out.println("Connection failed");
+            connectionFailed = true;
+            errorLabel.setText("Connection failed. Try again with another username.");
         }
     }
 }

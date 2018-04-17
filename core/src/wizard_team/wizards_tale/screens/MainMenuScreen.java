@@ -58,50 +58,7 @@ public class MainMenuScreen implements Screen {
     rootTable.setFillParent(true);
     rootTable.setDebug(true);
 
-    final Label messageList = new Label("", skin);
-    messageList.setText(
-            messageList.getText() + "\nhei"
-    );
-    ScrollPane messageScrollPane = new ScrollPane(messageList);
-    rootTable.add(messageScrollPane).expandX().expandY().bottom().left();
-
-    Button createRoomBtn = new TextButton("Create Room", skin);
-    rootTable.add(createRoomBtn);
-    createRoomBtn.addListener(
-            new ClickListener() {
-              @Override
-              public void clicked(InputEvent event, float x, float y) {
-                messageList.setText(messageList.getText() + "\nTrying to create room...");
-                game.warpClient.createRoom(
-                        "roomby",
-                        game.username,
-                        4,
-                        new HashMap<String, Object>());
-                game.warpClient.getOnlineUsers();
-              }
-            }
-    );
-
-    Button lobbyButton = new TextButton("New Lobby", skin);
-    rootTable.add(lobbyButton);
-    lobbyButton.addListener(
-            new ClickListener() {
-              @Override
-              public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new OnlineLobbyScreen(game));
-              }
-            });
-
-    TextButton onlineGameButton = new TextButton("Online Game", skin);
-    rootTable.add(onlineGameButton);
-    onlineGameButton.addListener(new ClickListener() {
-      @Override
-      public void clicked(InputEvent event, float x, float y) {
-        game.setScreen(new MPLoginScreen(game));
-      }
-    });
-
-    Button startButton = new TextButton("New Game", skin);
+    Button startButton = new TextButton("Single-player Game", skin);
     rootTable.add(startButton);
     startButton.addListener(
         new ClickListener() {
@@ -110,6 +67,15 @@ public class MainMenuScreen implements Screen {
             game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
           }
         });
+
+    TextButton onlineGameButton = new TextButton("Multiplayer Game", skin);
+    rootTable.add(onlineGameButton);
+    onlineGameButton.addListener(new ClickListener() {
+      @Override
+      public void clicked(InputEvent event, float x, float y) {
+        game.setScreen(new MPLoginScreen(game));
+      }
+    });
 
     return stage;
   }

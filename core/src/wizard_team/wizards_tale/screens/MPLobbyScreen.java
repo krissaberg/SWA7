@@ -13,20 +13,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
-import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
-import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
 
 import java.util.ArrayList;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
-import wizard_team.wizards_tale.appwarp_listeners.ConnectionEventListener;
 
 public class MPLobbyScreen implements Screen {
     private WizardsTaleGame game;
