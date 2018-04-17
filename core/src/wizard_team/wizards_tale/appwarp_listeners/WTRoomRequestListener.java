@@ -4,42 +4,51 @@ import com.shephertz.app42.gaming.multiplayer.client.events.LiveRoomInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.RoomRequestListener;
 
+import java.util.Observable;
+
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class WTRoomRequestListener implements RoomRequestListener {
+public class WTRoomRequestListener extends Observable implements RoomRequestListener {
     @Override
     public void onSubscribeRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onUnSubscribeRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onJoinRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onLeaveRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onGetLiveRoomInfoDone(LiveRoomInfoEvent liveRoomInfoEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(liveRoomInfoEvent);
     }
 
     @Override
     public void onSetCustomRoomDataDone(LiveRoomInfoEvent liveRoomInfoEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(liveRoomInfoEvent);
     }
 
     @Override
     public void onUpdatePropertyDone(LiveRoomInfoEvent liveRoomInfoEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(liveRoomInfoEvent);
     }
 
     @Override
@@ -54,12 +63,14 @@ public class WTRoomRequestListener implements RoomRequestListener {
 
     @Override
     public void onJoinAndSubscribeRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 
     @Override
     public void onLeaveAndUnsubscribeRoomDone(RoomEvent roomEvent) {
-        throw new NotImplementedException();
+        hasChanged();
+        notifyObservers(roomEvent);
     }
 }
 

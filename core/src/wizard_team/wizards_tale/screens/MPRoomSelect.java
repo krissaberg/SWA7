@@ -21,12 +21,17 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
+import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
+import com.shephertz.app42.gaming.multiplayer.client.events.LiveRoomInfoEvent;
+import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 
 import java.util.ArrayList;
+import java.util.Observable;
+import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
-public class MPRoomSelect implements Screen {
+public class MPRoomSelect implements Screen, Observer {
     private WizardsTaleGame game;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
@@ -37,9 +42,13 @@ public class MPRoomSelect implements Screen {
     private WarpClient warpClient;
     private ArrayList<String> messages = new ArrayList<String>();
     private Label messagesLabel;
+    private Array rooms = new Array();
+    private List roomList;
+    private float updateTimer = 2;
 
     public MPRoomSelect(WizardsTaleGame game) {
         this.game = game;
+        game.awListeners.zoneRequestListener.addObserver(this);
         spriteBatch = game.getSpriteBatch();
         assetManager = game.getAssetManager();
         skin = game.getSkin();
@@ -49,6 +58,11 @@ public class MPRoomSelect implements Screen {
         stage = createStage(viewport);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
+        updateRoomList();
+    }
+
+    private void updateRoomList() {
+        warpClient.getAllRooms();
     }
 
     private Stage createStage(Viewport viewport) {
@@ -67,13 +81,7 @@ public class MPRoomSelect implements Screen {
 
         rootTable.row();
 
-        List roomList = new List(skin);
-        Array rooms = new Array();
-//        rooms.add(new Label("Room1 ", skin));
-        rooms.add("Room 1");
-        rooms.add("Room 2");
-        rooms.add("Room 3");
-        rooms.add("Room 4");
+        roomList = new List(skin);
         roomList.setItems(rooms);
         rootTable.add(roomList).expandX().expandY().left().top();
 
@@ -92,6 +100,12 @@ public class MPRoomSelect implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        updateTimer -= delta;
+        if(updateTimer < 0) {
+            updateRoomList();
+            updateTimer = 2;
+        }
 
         stage.act(delta);
         stage.draw();
@@ -123,5 +137,19 @@ public class MPRoomSelect implements Screen {
 
     }
 
+    @Override
+    public void update(Observable observable, Object o) {
+        Gdx.app.log("MPRoomSelect", "Something happened");
+        Gdx.app.log("MPRoomSelect", o.toString());
+        if(o instanceof AllRoomsEvent) {
+            AllRoomsEvent e = (AllRoomsEvent) o;
+            rooms = new Array(e.getRoomIds());
+            rooms.sort();
+            roomList.setItems(rooms);
+        }
+        if(o instanceof LiveRoomInfoEvent) {
+            System.out.println(((RoomEvent) o).getResult());
+        }
+    }
 }
 
