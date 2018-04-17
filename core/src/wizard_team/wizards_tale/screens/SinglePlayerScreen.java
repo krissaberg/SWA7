@@ -2,11 +2,14 @@ package wizard_team.wizards_tale.screens;
 
 import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
+
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -44,6 +47,8 @@ public class SinglePlayerScreen implements Screen {
   Viewport viewport;
   Camera camera;
 
+  float gameTimeLeft;
+
   Engine engine;
   Touchpad touchpad;
 
@@ -73,6 +78,10 @@ public class SinglePlayerScreen implements Screen {
     this.engine = createEngine();
   }
 
+  public void setGameTimeLeft(float gameTimeLeft) {
+    this.gameTimeLeft = gameTimeLeft;
+  }
+
   private Engine createEngine() {
     Engine eng = new Engine();
 
@@ -93,9 +102,9 @@ public class SinglePlayerScreen implements Screen {
       eng.addEntity(walker);
     }
 
-    // Clock entity
+    // Clock for Game Cycle entity
     Entity clock = new Entity();
-    clock.add(new CounterComponent(2));
+    clock.add(new CounterComponent(30));
     clock.add(new GameTimeComponent());
     eng.addEntity(clock);
 
@@ -106,7 +115,7 @@ public class SinglePlayerScreen implements Screen {
     eng.addSystem(new RenderSystem(spriteBatch));
     eng.addSystem(new InputSystem(touchpad));
     eng.addSystem(new CountDownSystem());
-    eng.addSystem(new GameCycleSystem(game));
+    eng.addSystem(new GameCycleSystem(game, this));
 
     return eng;
   };
@@ -123,6 +132,10 @@ public class SinglePlayerScreen implements Screen {
     Touchpad touchpad = new Touchpad(5, skin);
     rootTable.add(touchpad).bottom().left();
     this.touchpad = touchpad;
+
+    //Show gametime
+    Label gameTime = new Label(gameTimeLeft + "", skin);
+    rootTable.add(gameTime).bottom().center();
 
     rootTable.add(new Table()).expandX();
 
