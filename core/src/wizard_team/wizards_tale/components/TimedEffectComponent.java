@@ -12,7 +12,7 @@ import wizard_team.wizards_tale.components.constants.Constants;
 
 public class TimedEffectComponent implements Component{
     public int time;
-    private Constants.EffectTypes effect;
+    public Constants.EffectTypes effect;
 
     public TimedEffectComponent(int time, Constants.EffectTypes effect) {
         this.time = time;

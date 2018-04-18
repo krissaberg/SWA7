@@ -27,10 +27,13 @@ public class Constants {
     //TODO: for testing only, remove
     public static final int SCREEN_X  = 800;
     public static final int SCREEN_Y = 600;
-    public static final int DEFAULT_BOMB_DAMAGE = 1;
+    public static final int DEFAULT_BOMB_DAMAGE = 3;
+    public static final int DEFAULT_EXPLOSION_TIME = 10;
 
 
     public enum EffectTypes {SPREAD, VANISH};
+
+    public enum SpreadTypes {FLOW_AROUND_OBSTACLES, FLOW_CARTESIAN, FLOW_IGNORE_OBSTACLES};
 
     public enum CollidableType {
         HARD, // Nothing can pass through this

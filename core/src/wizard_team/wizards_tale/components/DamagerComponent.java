@@ -12,4 +12,8 @@ public class DamagerComponent implements Component {
     public DamagerComponent(int damage) {
         this.damage = damage;
     }
+
+    public int getDamage() {
+        return damage;
+    }
 }

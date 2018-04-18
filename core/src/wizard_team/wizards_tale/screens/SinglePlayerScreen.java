@@ -38,10 +38,12 @@ import com.badlogic.gdx.math.MathUtils;
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
-import wizard_team.wizards_tale.systems.BombRenderSystem;
+import wizard_team.wizards_tale.systems.BombSystem;
+import wizard_team.wizards_tale.systems.TimedRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
 import wizard_team.wizards_tale.systems.CellDebugRenderSystem;
+import wizard_team.wizards_tale.systems.ExplosionSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -64,6 +66,7 @@ public class SinglePlayerScreen implements Screen {
     private Texture blackMageTex;
     private Texture wallTexture;
     private Texture bombTexture;
+    private Texture explosionTexture;
     private InputSystem inputSystem;
 
     public SinglePlayerScreen(
@@ -83,11 +86,14 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/white_mage.png", Texture.class);
         assetManager.load("sprites/mountain.png", Texture.class);
         assetManager.load("sprites/bomb.png", Texture.class);
+        assetManager.load("sprites/explosion.png", Texture.class);
         assetManager.finishLoading();
+
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
         whiteMageTex = assetManager.get("sprites/white_mage.png", Texture.class);
         wallTexture = assetManager.get("sprites/mountain.png", Texture.class);
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
+        explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -162,7 +168,11 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new CellPositionSystem());
         eng.addSystem(new CellRenderSystem(spriteBatch));
         eng.addSystem(new CellDebugRenderSystem(spriteBatch));
-        eng.addSystem(new BombRenderSystem(spriteBatch, bombTexture));
+
+        //Bomb Systems
+        eng.addSystem(new BombSystem(bombTexture));
+        eng.addSystem(new ExplosionSystem(explosionTexture));
+        eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         return eng;
     }
