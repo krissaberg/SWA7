@@ -13,7 +13,7 @@ public class CollisionComponent implements Component {
         this.collidableType = Constants.CollidableType.HARD;
     }
 
-public CollisionComponent(Constants.CollidableType collidableType) {
+    public CollisionComponent(Constants.CollidableType collidableType) {
         this.collidableType = collidableType;
     }
 }
