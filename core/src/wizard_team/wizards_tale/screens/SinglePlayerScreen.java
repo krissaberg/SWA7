@@ -5,11 +5,13 @@ import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -36,9 +38,10 @@ import com.badlogic.gdx.math.MathUtils;
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
+import wizard_team.wizards_tale.systems.BombRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
-import wizard_team.wizards_tale.systems.DebugRenderSystem;
+import wizard_team.wizards_tale.systems.CellDebugRenderSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -55,10 +58,13 @@ public class SinglePlayerScreen implements Screen {
 
     private Engine engine;
     private Touchpad touchpad;
+    private Button bombButton;
 
     private Texture whiteMageTex;
     private Texture blackMageTex;
     private Texture wallTexture;
+    private Texture bombTexture;
+    private InputSystem inputSystem;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -76,10 +82,12 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/black_mage.png", Texture.class);
         assetManager.load("sprites/white_mage.png", Texture.class);
         assetManager.load("sprites/mountain.png", Texture.class);
+        assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.finishLoading();
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
         whiteMageTex = assetManager.get("sprites/white_mage.png", Texture.class);
         wallTexture = assetManager.get("sprites/mountain.png", Texture.class);
+        bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -148,12 +156,13 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new RandomWalkerSystem());
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
-        eng.addSystem(new InputSystem(touchpad));
+        inputSystem = new InputSystem(touchpad, bombButton);
+        eng.addSystem(inputSystem);
 
         eng.addSystem(new CellPositionSystem());
         eng.addSystem(new CellRenderSystem(spriteBatch));
-        eng.addSystem(new DebugRenderSystem(spriteBatch));
-
+        eng.addSystem(new CellDebugRenderSystem(spriteBatch));
+        eng.addSystem(new BombRenderSystem(spriteBatch, bombTexture));
 
         return eng;
     }
@@ -170,11 +179,17 @@ public class SinglePlayerScreen implements Screen {
         Touchpad touchpad = new Touchpad(15, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
-
         rootTable.add(new Table()).expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
+        this.bombButton = bombButton;
         rootTable.add(bombButton).bottom().right();
+        this.bombButton.addListener(new ChangeListener() {
+            @Override
+            public void changed (ChangeEvent event, Actor actor) {
+                inputSystem.setBombButtonPressed();
+            }
+        });
 
         return stage;
     }
