@@ -50,14 +50,14 @@ import wizard_team.wizards_tale.systems.InputSystem;
 public class SinglePlayerScreen implements Screen {
     private WizardsTaleGame game;
     Skin skin;
-    private Stage stage;
+    Stage stage;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
     private Viewport viewport;
     private Camera camera;
 
-    private Engine engine;
-    private Touchpad touchpad;
+    Engine engine;
+    Touchpad touchpad;
     private Button bombButton;
 
     private Texture whiteMageTex;
@@ -97,7 +97,7 @@ public class SinglePlayerScreen implements Screen {
         this(game, game.getSpriteBatch(), game.getSkin(), game.getAssetManager());
     }
 
-    private Engine createEngine() {
+    Engine createEngine() {
         Engine eng = new Engine();
 
         // Player character entity

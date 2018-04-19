@@ -3,9 +3,10 @@ package wizard_team.wizards_tale.screens;
 class GameConfig {
     float gameDuration;
     boolean powerupsActive;
+    public String hostUsername;
 
     public GameConfig() {
-        this.gameDuration = 5;
+        this.gameDuration = 60;
         this.powerupsActive = true;
     }
 

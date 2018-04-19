@@ -40,6 +40,7 @@ import wizard_team.wizards_tale.appwarp_listeners.RoomRequestEventType;
 
 public class MPRoom implements Screen, Observer {
     private final String tag = "MPRoom";
+    private final String username;
     private WizardsTaleGame game;
     private final RoomData roomData;
     private SpriteBatch spriteBatch;
@@ -60,7 +61,9 @@ public class MPRoom implements Screen, Observer {
     private final ArrayList<Observable> observables = new ArrayList<>();
 
     public MPRoom(WizardsTaleGame game, RoomData roomData, String currentUsername) {
+        username = currentUsername;
         roomUsers.add(currentUsername);
+        gameConfig.hostUsername = roomData.getRoomOwner();
         skin = game.getSkin();
         userList = new List<String>(skin);
         this.game = game;
@@ -220,7 +223,7 @@ public class MPRoom implements Screen, Observer {
         readyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                game.setScreen(new MPGameScreen(game, gameConfig));
+                game.setScreen(new MPGameScreen(game, gameConfig, username));
             }
         });
 
