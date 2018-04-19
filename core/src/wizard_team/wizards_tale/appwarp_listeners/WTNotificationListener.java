@@ -8,6 +8,11 @@ import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.UpdateEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.NotifyListener;
 
+import org.javatuples.Pair;
+import org.javatuples.Quartet;
+import org.javatuples.Quintet;
+import org.javatuples.Unit;
+
 import java.util.HashMap;
 import java.util.Observable;
 
@@ -28,13 +33,14 @@ public class WTNotificationListener extends Observable implements NotifyListener
 
     @Override
     public void onUserLeftRoom(RoomData roomData, String s) {
-        throw new NotImplementedException();
+        setChanged();
+        notifyObservers(Pair.with(NotificationEventType.USER_LEFT_ROOM, s));
     }
 
     @Override
     public void onUserJoinedRoom(RoomData roomData, String s) {
         setChanged();
-        notifyObservers(roomData);
+        notifyObservers(Pair.with(NotificationEventType.USER_JOINED_ROOM, s));
     }
 
     @Override
@@ -49,7 +55,8 @@ public class WTNotificationListener extends Observable implements NotifyListener
 
     @Override
     public void onChatReceived(ChatEvent chatEvent) {
-        throw new NotImplementedException();
+        setChanged();
+        notifyObservers(Pair.with(NotificationEventType.CHAT_RECEIVED, chatEvent));
     }
 
     @Override
@@ -64,12 +71,15 @@ public class WTNotificationListener extends Observable implements NotifyListener
 
     @Override
     public void onUpdatePeersReceived(UpdateEvent updateEvent) {
-        throw new NotImplementedException();
+        setChanged();
+        notifyObservers(Pair.with(NotificationEventType.UPDATE_PEERS_RECEIVED, updateEvent));
     }
 
     @Override
     public void onUserChangeRoomProperty(RoomData roomData, String s, HashMap<String, Object> hashMap, HashMap<String, String> hashMap1) {
-        throw new NotImplementedException();
+        setChanged();
+        notifyObservers(Quintet.with(NotificationEventType.USER_CHANGE_ROOM_PROPERTY,
+                roomData, s, hashMap, hashMap1));
     }
 
     @Override

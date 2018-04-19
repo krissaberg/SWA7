@@ -24,6 +24,8 @@ import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 
+import org.javatuples.Tuple;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
@@ -31,7 +33,8 @@ import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.EventType;
-import wizard_team.wizards_tale.appwarp_listeners.EventWrapper;
+import wizard_team.wizards_tale.appwarp_listeners.RoomRequestEventType;
+import wizard_team.wizards_tale.appwarp_listeners.ZoneRequestEventType;
 
 public class MPRoomSelect implements Screen, Observer {
     private WizardsTaleGame game;
@@ -52,6 +55,7 @@ public class MPRoomSelect implements Screen, Observer {
     private boolean enterRoom = false;
     private RoomData roomData;
     private final String tag = "RoomSelect";
+    private boolean handleEvents = true;
 
     public MPRoomSelect(WizardsTaleGame game, String username) {
         this.game = game;
@@ -95,7 +99,7 @@ public class MPRoomSelect implements Screen, Observer {
                         newRoomName.getText(),
                         username,
                         4,
-                         roomProps
+                        roomProps
                 );
             }
         });
@@ -123,6 +127,7 @@ public class MPRoomSelect implements Screen, Observer {
     public void show() {
         Gdx.input.setInputProcessor(this.stage);
         updateRoomList();
+        handleEvents = true;
     }
 
     @Override
@@ -131,14 +136,14 @@ public class MPRoomSelect implements Screen, Observer {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         updateTimer -= delta;
-        if(updateTimer < 0) {
+        if (updateTimer < 0) {
             updateRoomList();
             updateTimer = updatePeriod;
         }
 
-        if(enterRoom) {
+        if (enterRoom) {
             enterRoom = false;
-            game.setScreen(new MPRoom(game, roomData));
+            game.setScreen(new MPRoom(game, roomData, username));
         }
 
         stage.act(delta);
@@ -163,7 +168,7 @@ public class MPRoomSelect implements Screen, Observer {
 
     @Override
     public void hide() {
-
+        handleEvents = false;
     }
 
     @Override
@@ -173,41 +178,40 @@ public class MPRoomSelect implements Screen, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if(o instanceof AllRoomsEvent) {
-            AllRoomsEvent e = (AllRoomsEvent) o;
-            if (e.getRoomIds() != null) {
-                rooms = new Array(e.getRoomIds());
-                rooms.sort();
-                roomList.setItems(rooms);
-            }
+        if (!handleEvents) {
+            return;
         }
 
-        else if(o instanceof RoomEvent) {
-            RoomEvent e = (RoomEvent) o;
-            String tag = "RoomEvent";
-            Gdx.app.log(tag, e.toString());
-            Gdx.app.log(tag, e.getData().toString());
-        }
-
-        else if(o instanceof RoomData) {
-            Gdx.app.log(tag, "Joining room");
-            RoomData d = (RoomData) o;
-            roomData = d;
-            enterRoom = true;
-        }
-
-        else if(o instanceof EventWrapper) {
-            EventWrapper wrapper = (EventWrapper) o;
-            EventType type = wrapper.type;
-            Object event = wrapper.event;
-            switch(type) {
+        Tuple tup = (Tuple) o;
+        EventType type = (EventType) tup.getValue(0);
+        if (type instanceof RoomRequestEventType) {
+            switch ((RoomRequestEventType) type) {
                 case JOIN_AND_SUBSCRIBE:
-                    RoomEvent e = (RoomEvent) event;
-                    roomData = e.getData();
+                    RoomEvent joinSubEvent = (RoomEvent) tup.getValue(1);
+                    roomData = joinSubEvent.getData();
                     enterRoom = true;
                     break;
+                default:
+                    Gdx.app.log(tag, "Unhandled RoomRequestEventType: " + tup);
             }
+        } else if (type instanceof ZoneRequestEventType) {
+            switch ((ZoneRequestEventType) type) {
+                case GET_ALL_ROOMS_DONE:
+                    AllRoomsEvent getAllRoomsDone = (AllRoomsEvent) tup.getValue(1);
+                    if (getAllRoomsDone.getRoomIds() != null) {
+                        rooms = new Array(getAllRoomsDone.getRoomIds());
+                        rooms.sort();
+                        roomList.setItems(rooms);
+                        break;
+                    }
+                default:
+                    Gdx.app.log(tag, "Unhandled ZoneRequestEventType: " + tup);
+            }
+        } else {
+            Gdx.app.log(tag, "Unexpected EventType: " + tup.toString());
         }
+
     }
+
 }
 

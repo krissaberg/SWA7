@@ -22,10 +22,14 @@ import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
 
+import org.javatuples.Tuple;
+
 import java.util.Observable;
 import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
+import wizard_team.wizards_tale.appwarp_listeners.ConnectionRequestEventType;
+import wizard_team.wizards_tale.appwarp_listeners.EventType;
 
 public class MPLoginScreen implements Screen, Observer {
     private WizardsTaleGame game;
@@ -41,6 +45,7 @@ public class MPLoginScreen implements Screen, Observer {
     private boolean connectionFailed = false;
     private Label errorLabel;
     private TextField usernameArea;
+    private String tag = "MPLoginScreen";
 
     MPLoginScreen(WizardsTaleGame game) {
         this.game = game;
@@ -142,16 +147,31 @@ public class MPLoginScreen implements Screen, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        ConnectEvent event = (ConnectEvent) o;
-        isConnecting = false;
-        if (event.getResult() == WarpResponseResultCode.SUCCESS) {
-            System.out.println("Connection succeeded");
-            isConnected = true;
-            errorLabel.setText("Connection succeeded.");
+        Tuple tup = (Tuple) o;
+        EventType type = (EventType) tup.getValue(0);
+        if (type instanceof ConnectionRequestEventType) {
+            switch ((ConnectionRequestEventType) type) {
+                case CONNECT_DONE:
+                    ConnectEvent connectDone = (ConnectEvent) tup.getValue(1);
+                    if (connectDone.getResult() == WarpResponseResultCode.SUCCESS) {
+                        isConnected = true;
+                        isConnecting = false;
+                        connectionFailed = false;
+                        errorLabel.setText("Connection succeeded.");
+                    } else {
+                        isConnected = false;
+                        isConnecting = false;
+                        connectionFailed = true;
+                        errorLabel.setText("Connection failed. Try again with another username.");
+                    }
+                    break;
+                default:
+                    Gdx.app.log(
+                            this.getClass().toString(),
+                            "Unhandled ConnectionRequestEventType: " + tup);
+            }
         } else {
-            System.out.println("Connection failed");
-            connectionFailed = true;
-            errorLabel.setText("Connection failed. Try again with another username.");
+            Gdx.app.log(tag, "Unexpected event type: " + o);
         }
     }
 }

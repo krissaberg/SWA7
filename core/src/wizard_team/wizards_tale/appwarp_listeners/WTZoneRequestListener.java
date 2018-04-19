@@ -1,13 +1,13 @@
 package wizard_team.wizards_tale.appwarp_listeners;
 
-import com.badlogic.gdx.Gdx;
-import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.AllUsersEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.LiveUserInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.MatchedRoomsEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ZoneRequestListener;
+
+import org.javatuples.Pair;
 
 import java.util.Observable;
 
@@ -22,13 +22,13 @@ public class WTZoneRequestListener extends Observable implements ZoneRequestList
     @Override
     public void onGetAllRoomsDone(AllRoomsEvent allRoomsEvent) {
         setChanged();
-        notifyObservers(allRoomsEvent);
+        notifyObservers(Pair.with(ZoneRequestEventType.GET_ALL_ROOMS_DONE, allRoomsEvent));
     }
 
     @Override
     public void onCreateRoomDone(RoomEvent roomEvent) {
         setChanged();
-        notifyObservers(roomEvent);
+        notifyObservers(Pair.with(ZoneRequestEventType.CREATE_ROOM_DONE, roomEvent));
     }
 
     @Override
@@ -54,7 +54,7 @@ public class WTZoneRequestListener extends Observable implements ZoneRequestList
     @Override
     public void onGetAllRoomsCountDone(AllRoomsEvent allRoomsEvent) {
         setChanged();
-        notifyObservers(allRoomsEvent);
+        notifyObservers(Pair.with(ZoneRequestEventType.GET_ALL_ROOMS_COUNT_DONE, allRoomsEvent));
     }
 
     @Override

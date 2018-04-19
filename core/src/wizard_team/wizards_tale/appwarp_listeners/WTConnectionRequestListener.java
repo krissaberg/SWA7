@@ -1,29 +1,28 @@
 package wizard_team.wizards_tale.appwarp_listeners;
 
 import com.badlogic.gdx.Gdx;
-import com.shephertz.app42.gaming.multiplayer.client.command.WarpResponseResultCode;
 import com.shephertz.app42.gaming.multiplayer.client.events.ConnectEvent;
 import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
 
-import java.util.ArrayList;
+import org.javatuples.Pair;
+import org.javatuples.Unit;
+
 import java.util.Observable;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-public class WTConnectionRequestListener extends Observable implements ConnectionRequestListener  {
+public class WTConnectionRequestListener extends Observable implements ConnectionRequestListener {
 
     @Override
     public void onConnectDone(ConnectEvent connectEvent) {
-        Gdx.app.log("CRL", "onConnectDone");
         setChanged();
-        notifyObservers(connectEvent);
+        notifyObservers(Pair.with(ConnectionRequestEventType.CONNECT_DONE, connectEvent));
     }
 
     @Override
     public void onDisconnectDone(ConnectEvent connectEvent) {
-        Gdx.app.log("CRL", "onDisconnectDone");
         setChanged();
-        notifyObservers(connectEvent);
+        notifyObservers(Pair.with(ConnectionRequestEventType.DISCONNECT_DONE, connectEvent));
     }
 
     @Override
