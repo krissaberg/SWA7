@@ -35,12 +35,45 @@ public class BombSystem extends IteratingSystem {
     public void processEntity(Entity e, float dt) {
         DamagerComponent damager = damagerMapper.get(e);
         TimedEffectComponent timeEffect = timeEffectMapper.get(e);
+        CellPositionComponent cellPos= cellPosMapper.get(e);
 
-        if (timeEffect.time==0) {
-            //Bomb is the start of an explosion (this makes it taken in by Explosion system)
-            e.add(new SpreadableComponent(damager.getDamage()));
-            //For rendering
+
+        int start_x = cellPos.x;
+        int start_y = cellPos.y;
+        int depth = damager.getDamage();
+
+        if (timeEffect.time == 0) {
+            //Spread is of type SPREAD, move in + pattern
+            for (int i = 1; i < depth; i++) {
+                // Add explosion entities, found by Spreadable property
+                Entity explosion_right = new Entity();
+                Entity explosion_left = new Entity();
+                Entity explosion_up = new Entity();
+                Entity explosion_down = new Entity();
+
+                explosion_right.add(new CellPositionComponent(start_x + i, start_y));
+                explosion_left.add(new CellPositionComponent(start_x - i, start_y));
+                explosion_up.add(new CellPositionComponent(start_x, start_y + i));
+                explosion_down.add(new CellPositionComponent(start_x, start_y - i));
+
+                explosion_right.add(new SpreadableComponent(depth - 1));
+                explosion_left.add(new SpreadableComponent(depth - 1));
+                explosion_up.add(new SpreadableComponent(depth - 1));
+                explosion_down.add(new SpreadableComponent(depth - 1));
+
+                explosion_right.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
+                explosion_left.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
+                explosion_up.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
+                explosion_down.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
+
+                getEngine().addEntity(explosion_right);
+                getEngine().addEntity(explosion_left);
+                getEngine().addEntity(explosion_up);
+                getEngine().addEntity(explosion_down);
+
+            }
         } else {
+            // Render as bomb, time down handled by TimedRenderSystem
             e.add(new SpriteComponent(this.bombTexture));
         }
     }

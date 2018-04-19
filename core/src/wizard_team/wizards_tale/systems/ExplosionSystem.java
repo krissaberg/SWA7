@@ -36,51 +36,7 @@ public class ExplosionSystem extends IteratingSystem {
         SpreadableComponent spreadable = spreadMapper.get(e);
         TimedEffectComponent timedEffect = effectMapper.get(e);
 
-        int start_x = cellPos.x;
-        int start_y = cellPos.y;
-        int depth = spreadable.depth;
-
-        if (depth == 0) {
-            getEngine().removeEntity(e);
-        }
-
-        //Check the spread type
-        else if (timedEffect.effect == Constants.EffectTypes.SPREAD) {
-            e.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
-
-            //Spread is of type SPREAD, move in + pattern
-            //Add new explosion entities
-            for (int i = 1; i < depth; i++) {
-                Entity explosion_right = new Entity();
-                Entity explosion_left = new Entity();
-                Entity explosion_up = new Entity();
-                Entity explosion_down = new Entity();
-
-
-                explosion_right.add(new CellPositionComponent(start_x + i, start_y));
-                explosion_left.add(new CellPositionComponent(start_x - i, start_y));
-                explosion_up.add(new CellPositionComponent(start_x, start_y + i));
-                explosion_down.add(new CellPositionComponent(start_x, start_y - i));
-
-                explosion_right.add(new SpreadableComponent(depth - 1));
-                explosion_left.add(new SpreadableComponent(depth - 1));
-                explosion_up.add(new SpreadableComponent(depth - 1));
-                explosion_down.add(new SpreadableComponent(depth - 1));
-
-                explosion_right.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
-                explosion_left.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
-                explosion_up.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
-                explosion_down.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
-
-                getEngine().addEntity(explosion_right);
-                getEngine().addEntity(explosion_left);
-                getEngine().addEntity(explosion_up);
-                getEngine().addEntity(explosion_down);
-                getEngine().removeEntity(e);
-            }
-        }
-        else {
-            //Render it with a new texture
+        if (timedEffect.time != 0) {
             e.add(new SpriteComponent(explosionTexture));
         }
 
