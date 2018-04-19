@@ -56,12 +56,18 @@ public class MPRoomSelect implements Screen, Observer {
     private RoomData roomData;
     private final String tag = "RoomSelect";
     private boolean handleEvents = true;
+    private final ArrayList<Observable> observables = new ArrayList<>();
 
     public MPRoomSelect(WizardsTaleGame game, String username) {
         this.game = game;
         this.username = username;
-        game.awListeners.zoneRequestListener.addObserver(this);
-        game.awListeners.roomRequestListener.addObserver(this);
+
+        observables.add(game.awListeners.zoneRequestListener);
+        observables.add(game.awListeners.roomRequestListener);
+        for (Observable observable : observables) {
+            observable.addObserver(this);
+        }
+
         spriteBatch = game.getSpriteBatch();
         assetManager = game.getAssetManager();
         skin = game.getSkin();
@@ -124,13 +130,6 @@ public class MPRoomSelect implements Screen, Observer {
     }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(this.stage);
-        updateRoomList();
-        handleEvents = true;
-    }
-
-    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -167,13 +166,27 @@ public class MPRoomSelect implements Screen, Observer {
     }
 
     @Override
+    public void show() {
+        Gdx.input.setInputProcessor(this.stage);
+        updateRoomList();
+        handleEvents = true;
+        for (Observable observable : observables) {
+            observable.addObserver(this);
+        }
+    }
+
+    @Override
     public void hide() {
-        handleEvents = false;
+        for (Observable observable : observables) {
+            observable.deleteObserver(this);
+        }
     }
 
     @Override
     public void dispose() {
-
+        for (Observable observable : observables) {
+            observable.deleteObserver(this);
+        }
     }
 
     @Override
@@ -189,7 +202,12 @@ public class MPRoomSelect implements Screen, Observer {
                 case JOIN_AND_SUBSCRIBE:
                     RoomEvent joinSubEvent = (RoomEvent) tup.getValue(1);
                     roomData = joinSubEvent.getData();
-                    enterRoom = true;
+                    if (roomData != null) {
+                        enterRoom = true;
+                        Gdx.app.log(tag, roomData.toString());
+                    } else {
+                        Gdx.app.log(tag, tup.toString());
+                    }
                     break;
                 default:
                     Gdx.app.log(tag, "Unhandled RoomRequestEventType: " + tup);

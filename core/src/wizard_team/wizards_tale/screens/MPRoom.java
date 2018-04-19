@@ -19,7 +19,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
@@ -58,6 +57,7 @@ public class MPRoom implements Screen, Observer {
     private CheckBox powerupsToggle;
     private final HashMap<String, Object> roomProps = new HashMap<>();
     private boolean propsHaveChanged = false;
+    private final ArrayList<Observable> observables = new ArrayList<>();
 
     public MPRoom(WizardsTaleGame game, RoomData roomData, String currentUsername) {
         roomUsers.add(currentUsername);
@@ -74,8 +74,13 @@ public class MPRoom implements Screen, Observer {
         stage = createStage(viewport);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
-        game.awListeners.notificationListener.addObserver(this);
-        game.awListeners.roomRequestListener.addObserver(this);
+
+        observables.add(game.awListeners.notificationListener);
+        observables.add(game.awListeners.roomRequestListener);
+        for (Observable observable : observables) {
+            observable.addObserver(this);
+        }
+
         warpClient.getLiveRoomInfo(roomData.getId());
     }
 
@@ -128,7 +133,7 @@ public class MPRoom implements Screen, Observer {
                 case SET_CUSTOM_ROOM_DATA:
                 case UPDATE_PROPERTY_DONE:
                 case JOIN_AND_SUBSCRIBE:
-                case LEAVE_AND_SUBSCRIBE:
+                case LEAVE_AND_UNSUBSCRIBE:
                 case JOIN_ROOM_DONE:
                 case LEAVE_ROOM_DONE:
                 case SUBSCRIBE_ROOM_DONE:
@@ -223,11 +228,6 @@ public class MPRoom implements Screen, Observer {
     }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(this.stage);
-    }
-
-    @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -263,17 +263,29 @@ public class MPRoom implements Screen, Observer {
 
     @Override
     public void resume() {
+    }
 
+    @Override
+    public void show() {
+        Gdx.input.setInputProcessor(this.stage);
+        for (Observable observable : observables) {
+            observable.addObserver(this);
+        }
     }
 
     @Override
     public void hide() {
-
+        for (Observable observable : observables) {
+            observable.deleteObserver(this);
+        }
     }
 
     @Override
     public void dispose() {
-
+        for (Observable observable : observables) {
+            observable.deleteObserver(this);
+        }
+        warpClient.leaveAndUnsubscribeRoom(roomData.getId());
     }
 
 }

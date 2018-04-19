@@ -74,7 +74,7 @@ public class WTRoomRequestListener extends Observable implements RoomRequestList
     @Override
     public void onLeaveAndUnsubscribeRoomDone(RoomEvent roomEvent) {
         setChanged();
-        notifyObservers(Pair.with(RoomRequestEventType.LEAVE_AND_SUBSCRIBE, roomEvent));
+        notifyObservers(Pair.with(RoomRequestEventType.LEAVE_AND_UNSUBSCRIBE, roomEvent));
     }
 
 }

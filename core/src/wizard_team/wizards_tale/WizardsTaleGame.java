@@ -26,13 +26,18 @@ public class WizardsTaleGame extends Game {
     private final Properties gameProperties = new Properties();
     private final ArrayList<String> consoleMessages = new ArrayList<String>();
     public final AWListeners awListeners = new AWListeners();
+
     public void addConsoleMsg(String s) {
         consoleMessages.add(s);
     }
+
     private Stack<Screen> screenStack = new Stack<Screen>();
 
     @Override
     public void setScreen(Screen screen) {
+        if (!screenStack.empty()) {
+            screenStack.peek().hide();
+        }
         super.setScreen(screen);
         screenStack.push(screen);
     }
@@ -41,6 +46,7 @@ public class WizardsTaleGame extends Game {
         Screen prevScreen = screenStack.pop();
         prevScreen.dispose();
         super.setScreen(screenStack.peek());
+        screenStack.peek().show();
     }
 
     public ArrayList<String> getConsoleMessages() {
