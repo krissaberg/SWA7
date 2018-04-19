@@ -112,7 +112,8 @@ public class MPRoom implements Screen, Observer {
                     updateUserList();
                     break;
                 case UPDATE_PEERS_RECEIVED:
-                    break;
+                default:
+                    Gdx.app.log(tag, "Unhandled NotificationEventType: " + tup.toString());
             }
         } else if (type instanceof RoomRequestEventType) {
             switch ((RoomRequestEventType) type) {
@@ -123,6 +124,17 @@ public class MPRoom implements Screen, Observer {
                         roomUsers.add(username);
                         updateUserList();
                     }
+                    break;
+                case SET_CUSTOM_ROOM_DATA:
+                case UPDATE_PROPERTY_DONE:
+                case JOIN_AND_SUBSCRIBE:
+                case LEAVE_AND_SUBSCRIBE:
+                case JOIN_ROOM_DONE:
+                case LEAVE_ROOM_DONE:
+                case SUBSCRIBE_ROOM_DONE:
+                case UNSUBSCRIBE_ROOM_DONE:
+                default:
+                    Gdx.app.log(tag, "Unhandled RoomRequestEventType: " + tup.toString());
             }
         }
     }
