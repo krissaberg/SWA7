@@ -23,18 +23,21 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
+import com.shephertz.app42.gaming.multiplayer.client.events.LiveRoomInfoEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 
 import org.javatuples.Tuple;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Observable;
 import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.EventType;
 import wizard_team.wizards_tale.appwarp_listeners.NotificationEventType;
+import wizard_team.wizards_tale.appwarp_listeners.RoomRequestEventType;
 
 public class MPRoom implements Screen, Observer {
     private final String tag = "MPRoom";
@@ -47,7 +50,7 @@ public class MPRoom implements Screen, Observer {
     private Viewport viewport;
     private WarpClient warpClient;
     private ArrayList<ChatMessage> chatMessages;
-    private Array<String> roomUsers = new Array<String>();
+    private HashSet<String> roomUsers = new HashSet<>();
     private List<String> userList;
     private GameConfig gameConfig = new GameConfig();
     private Slider durationSlider;
@@ -72,12 +75,16 @@ public class MPRoom implements Screen, Observer {
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
         game.awListeners.notificationListener.addObserver(this);
+        game.awListeners.roomRequestListener.addObserver(this);
+        warpClient.getLiveRoomInfo(roomData.getId());
     }
 
     @Override
     public void update(Observable observable, Object o) {
         Tuple tup = (Tuple) o;
         EventType type = (EventType) tup.getValue(0);
+
+        Gdx.app.log(tag, tup.toString());
 
         if (type instanceof NotificationEventType) {
             switch ((NotificationEventType) type) {
@@ -92,8 +99,36 @@ public class MPRoom implements Screen, Observer {
                     gameConfig.powerupsActive = (boolean) hashMap.get(RoomProp.POWERUPS_ACTIVE);
                     gameConfig.gameDuration = Float.valueOf((int) hashMap.get(RoomProp.DURATION_SEC));
                     break;
+                case CHAT_RECEIVED:
+                    break;
+                case USER_JOINED_ROOM:
+                    String joinedUser = (String) tup.getValue(1);
+                    roomUsers.add(joinedUser);
+                    updateUserList();
+                    break;
+                case USER_LEFT_ROOM:
+                    String departedUser = (String) tup.getValue(1);
+                    roomUsers.remove(departedUser);
+                    updateUserList();
+                    break;
+                case UPDATE_PEERS_RECEIVED:
+                    break;
+            }
+        } else if (type instanceof RoomRequestEventType) {
+            switch ((RoomRequestEventType) type) {
+                case GET_LIVE_ROOM_INFO:
+                    LiveRoomInfoEvent event = (LiveRoomInfoEvent) tup.getValue(1);
+                    for (String username : event.getJoinedUsers()) {
+                        Gdx.app.log(tag, "User joined: " + username);
+                        roomUsers.add(username);
+                        updateUserList();
+                    }
             }
         }
+    }
+
+    private void updateUserList() {
+        userList.setItems(roomUsers.toArray(new String[0]));
     }
 
     private Stage createStage(Viewport viewport) {
@@ -121,7 +156,7 @@ public class MPRoom implements Screen, Observer {
 
         // List of players in room
         rootTable.row();
-        userList.setItems(roomUsers);
+        userList.setItems(roomUsers.toArray(new String[0]));
         rootTable.add(userList);
 
         // Room settings
@@ -198,7 +233,6 @@ public class MPRoom implements Screen, Observer {
                     roomProps,
                     null);
         }
-
 
         stage.act(delta);
         stage.draw();
