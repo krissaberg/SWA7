@@ -29,11 +29,7 @@ import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
-public class MPGameScreen implements Screen, Observer {
-    private WizardsTaleGame game;
-    private SpriteBatch spriteBatch;
-    private AssetManager assetManager;
-    private Skin skin;
+public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer {
     private Stage stage;
     private Viewport viewport;
     private WarpClient warpClient;
@@ -43,13 +39,10 @@ public class MPGameScreen implements Screen, Observer {
     private GameConfig gameConfig;
 
     public MPGameScreen(WizardsTaleGame game, GameConfig gameConfig) {
-        skin = game.getSkin();
+        super(game);
         this.gameConfig = gameConfig;
         userList = new List<String>(skin);
-        this.game = game;
         game.awListeners.zoneRequestListener.addObserver(this);
-        spriteBatch = game.getSpriteBatch();
-        assetManager = game.getAssetManager();
         Camera camera = new OrthographicCamera();
         viewport = new FitViewport(800, 600, camera);
         viewport.apply(true);
@@ -77,47 +70,8 @@ public class MPGameScreen implements Screen, Observer {
     }
 
     @Override
-    public void show() {
-        Gdx.input.setInputProcessor(this.stage);
-    }
-
-    @Override
-    public void render(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        stage.act(delta);
-        stage.draw();
-    }
-
-    @Override
-    public void resize(int width, int height) {
-        viewport.update(width, height, true);
-        spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-
-    }
-
-    @Override
-    public void dispose() {
-
-    }
-
-    @Override
     public void update(Observable observable, Object o) {
+
     }
 }
 

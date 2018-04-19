@@ -49,7 +49,7 @@ import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
     private WizardsTaleGame game;
-    private Skin skin;
+    Skin skin;
     private Stage stage;
     private SpriteBatch spriteBatch;
     private AssetManager assetManager;
@@ -91,6 +91,10 @@ public class SinglePlayerScreen implements Screen {
 
         // Create engine
         this.engine = createEngine();
+    }
+
+    public SinglePlayerScreen(WizardsTaleGame game) {
+        this(game, game.getSpriteBatch(), game.getSkin(), game.getAssetManager());
     }
 
     private Engine createEngine() {
