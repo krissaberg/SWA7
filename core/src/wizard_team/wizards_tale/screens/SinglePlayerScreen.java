@@ -25,6 +25,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
+import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
@@ -115,6 +116,7 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
                 blackMageTex.getWidth(), blackMageTex.getHeight())));
         playerCharacter.add(new CollisionComponent(Constants.CollidableType.SOFT));
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
         eng.addEntity(playerCharacter);
 
         // Random walkers

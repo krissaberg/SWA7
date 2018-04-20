@@ -27,8 +27,14 @@ public class Constants {
     //TODO: for testing only, remove
     public static final int SCREEN_X  = 800;
     public static final int SCREEN_Y = 600;
-    public static final int DEFAULT_BOMB_DAMAGE = 3;
     public static final int DEFAULT_EXPLOSION_TIME = 10;
+    public static final int DEFAULT_BOMB_RANGE = 3;
+    public static final int DEFAULT_BOMB_DEPTH = 1; //Solid blocks have a height that is over depth
+    public static final int DEFAULT_BOMB_DAMAGE = 2;
+
+
+
+    public static final int DEFAULT_BLOCK_HP = 1;
 
 
     public enum EffectTypes {SPREAD, VANISH};
