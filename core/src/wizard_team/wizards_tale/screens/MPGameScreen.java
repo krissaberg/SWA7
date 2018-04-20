@@ -1,6 +1,7 @@
 package wizard_team.wizards_tale.screens;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -39,7 +40,9 @@ import java.util.Observer;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.EventType;
+import wizard_team.wizards_tale.appwarp_listeners.NetworkIDComponent;
 import wizard_team.wizards_tale.appwarp_listeners.NotificationEventType;
+import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.systems.ClientSystem;
 import wizard_team.wizards_tale.systems.ServerSystem;
 
@@ -50,12 +53,10 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
     private final boolean isHost;
     private final String username;
     private WarpClient warpClient;
-    private ArrayList<ChatMessage> chatMessages;
-    private Array<String> roomUsers = new Array<String>();
-    private List<String> userList;
     private GameConfig gameConfig;
     private String tag = "MPGameScreen";
     private boolean gameStarted = false;
+    private int networkId = 0;
 
     public MPGameScreen(WizardsTaleGame game, GameConfig gameConfig, String username) {
         super(game);
@@ -63,7 +64,6 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
         this.username = username;
         this.isHost = username.equals(gameConfig.hostUsername);
         this.gameConfig = gameConfig;
-        userList = new List<String>(skin);
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
 
@@ -80,6 +80,12 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
     }
 
     private void createEngineHost(Engine engine) {
+        for (Object user : gameConfig.users) {
+            Entity e = new Entity();
+            e.add(new NetworkIDComponent(networkId++));
+            e.add(new PositionComponent(10, 20));
+            engine.addEntity(e);
+        }
     }
 
     private void addMultiplayerSystems(Engine engine) {

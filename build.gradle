@@ -5,6 +5,7 @@ buildscript {
         mavenLocal()
         mavenCentral()
         maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url "https://maven.google.com/" }
         jcenter()
     }
     dependencies {
@@ -83,6 +84,8 @@ project(":core") {
         compile "com.badlogicgames.ashley:ashley:$ashleyVersion"
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "org.javatuples:javatuples:1.2"
+        compile "com.google.code.gson:gson:2.8.2"
+        compile "org.apache.commons:commons-lang3:3.7"
         
     }
 }

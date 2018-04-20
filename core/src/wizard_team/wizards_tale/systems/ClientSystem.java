@@ -36,35 +36,12 @@ public class ClientSystem extends IntervalSystem {
     @Override
     protected void updateInterval() {
         sendInputsToServer();
+        updateLocalState();
     }
 
     private void updateLocalState() {
     }
 
     private void sendInputsToServer() {
-        // Poll joystick, send queued button presses
-        Vector2 joystickVec = new Vector2(touchpad.getKnobPercentX(), touchpad.getKnobPercentY());
-
-        if (joystickVec.len() > 0.1) {
-            Triplet<Long, Float, Float> triplet = Triplet.with(
-                    TimeUtils.timeSinceMillis(startTimeMillis),
-                    joystickVec.x,
-                    joystickVec.y);
-
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            ObjectOutput out = null;
-            byte[] bytes = new byte[0];
-            try {
-                out = new ObjectOutputStream(bos);
-                out.writeObject(triplet);
-                out.flush();
-                bytes = bos.toByteArray();
-                bos.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            warpClient.sendUpdatePeers(bytes);
-        }
     }
 }

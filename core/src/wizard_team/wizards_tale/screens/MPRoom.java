@@ -63,12 +63,10 @@ public class MPRoom implements Screen, Observer {
     public MPRoom(WizardsTaleGame game, RoomData roomData, String currentUsername) {
         username = currentUsername;
         roomUsers.add(currentUsername);
-        gameConfig.hostUsername = roomData.getRoomOwner();
         skin = game.getSkin();
         userList = new List<String>(skin);
         this.game = game;
         this.roomData = roomData;
-        game.awListeners.zoneRequestListener.addObserver(this);
         spriteBatch = game.getSpriteBatch();
         assetManager = game.getAssetManager();
         Camera camera = new OrthographicCamera();
@@ -78,6 +76,7 @@ public class MPRoom implements Screen, Observer {
         warpClient = game.getWarpClient();
         Gdx.input.setInputProcessor(this.stage);
 
+        observables.add(game.awListeners.zoneRequestListener);
         observables.add(game.awListeners.notificationListener);
         observables.add(game.awListeners.roomRequestListener);
         for (Observable observable : observables) {
@@ -85,6 +84,9 @@ public class MPRoom implements Screen, Observer {
         }
 
         warpClient.getLiveRoomInfo(roomData.getId());
+
+        gameConfig.users = roomUsers;
+        gameConfig.hostUsername = roomData.getRoomOwner();
     }
 
     @Override
