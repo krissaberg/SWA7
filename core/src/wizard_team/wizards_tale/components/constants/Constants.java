@@ -28,13 +28,11 @@ public class Constants {
     public static final int DEFAULT_BOMB_DEPTH = 3; //Solid blocks have a height that is over depth
     public static final int DEFAULT_BOMB_DAMAGE = 2;
 
-
-
-    public static final int DEFAULT_BLOCK_HP = 1;
-
     public static final int HARD_BLOCK_HEIGHT = 10;
     public static final int SOFT_BLOCK_HEIGHT = 1;
 
+    public static final int DEFAULT_BLOCK_HP = 1;
+    public static final int DEFAULT_PLAYER_HP = 1;
 
 
     public enum EffectTypes {SPREAD, VANISH};
