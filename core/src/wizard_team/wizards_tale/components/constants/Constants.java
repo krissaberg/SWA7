@@ -41,9 +41,10 @@ public class Constants {
 
     public enum SpreadTypes {FLOW_AROUND_OBSTACLES, FLOW_CARTESIAN, FLOW_IGNORE_OBSTACLES};
 
-    public enum CollidableType {
+    public enum CollideableType {
         HARD, // Nothing can pass through this
-        SOFT  // Soft entities can pass through other soft entities
+        SOFT,  // Soft entities can pass through other soft entities
+        NONE
     }
 
 

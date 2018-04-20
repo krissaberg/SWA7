@@ -78,7 +78,7 @@ public class ExplosionSystem extends IteratingSystem {
                         destroyable.remove(CollideableComponent.class);
                         //Make a regular tile hp
                         destroyable.add(new DestroyableComponent(0));
-                        destroyable.add(new CollideableComponent(0));
+                        destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
 
                     }
                 }
