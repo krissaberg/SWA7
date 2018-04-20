@@ -29,6 +29,7 @@ import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
+import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.CollisionComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
@@ -148,12 +149,13 @@ public class SinglePlayerScreen implements Screen {
                 if (x==0 & y==Constants.MAP_Y-1) {continue;}
                 Entity tile = new Entity();
 
-                tile.add(new CellPositionComponent(
-                        (int) (x), (int) (y)));
+                tile.add(new CellPositionComponent(x,y));
+                tile.add(new DestroyableComponent(0));
+                tile.add(new CollideableComponent(0));
 
                 //Collision
-                tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
-                tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+                //tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
+                //tile.add(new CollisionComponent(Constants.CollidableType.HARD));
 
                 //For rendering
                 tile.add(new PositionComponent(
@@ -161,10 +163,13 @@ public class SinglePlayerScreen implements Screen {
 
                 if (x % 2 == 0 && y % 2 == 0) {
                     tile.add(new SpriteComponent(wallTexture));
+                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT));
 
                 } else {
                     tile.add(new SpriteComponent(softWallTexture));
                     tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT));
+
 
                 }
                 eng.addEntity(tile);

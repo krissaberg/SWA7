@@ -62,7 +62,9 @@ public class TimedRenderSystem extends IteratingSystem {
 
         } else {
             //Remove the entity
-            getEngine().removeEntity(e);
+            e.remove(TimedEffectComponent.class);
+            e.remove(SpriteComponent.class);
+            //getEngine().removeEntity(e);
         }
 
     }
