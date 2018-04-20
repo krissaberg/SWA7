@@ -1,5 +1,6 @@
 package wizard_team.wizards_tale.screens;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Game;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,6 +29,7 @@ import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
 import com.shephertz.app42.gaming.multiplayer.client.events.RoomData;
 import com.shephertz.app42.gaming.multiplayer.client.events.UpdateEvent;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.javatuples.Triplet;
 import org.javatuples.Tuple;
 
@@ -42,6 +45,7 @@ import wizard_team.wizards_tale.WizardsTaleGame;
 import wizard_team.wizards_tale.appwarp_listeners.EventType;
 import wizard_team.wizards_tale.appwarp_listeners.NetworkIDComponent;
 import wizard_team.wizards_tale.appwarp_listeners.NotificationEventType;
+import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.systems.ClientSystem;
 import wizard_team.wizards_tale.systems.ServerSystem;
@@ -57,6 +61,7 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
     private String tag = "MPGameScreen";
     private boolean gameStarted = false;
     private int networkId = 0;
+    private ClientSystem clientSystem;
 
     public MPGameScreen(WizardsTaleGame game, GameConfig gameConfig, String username) {
         super(game);
@@ -84,12 +89,14 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
             Entity e = new Entity();
             e.add(new NetworkIDComponent(networkId++));
             e.add(new PositionComponent(10, 20));
+            e.add(new BoundRectComponent(new Rectangle(0, 0, 50, 60)));
             engine.addEntity(e);
         }
     }
 
     private void addMultiplayerSystems(Engine engine) {
-        engine.addSystem(new ClientSystem(TICK_INTERVAL, warpClient, touchpad, TimeUtils.millis()));
+        clientSystem = new ClientSystem(TICK_INTERVAL, warpClient, touchpad, TimeUtils.millis());
+        engine.addSystem(clientSystem);
         if (isHost) {
             Gdx.app.log(tag, "This is the host. Adding a ServerSystem.");
             engine.addSystem(new ServerSystem(TICK_INTERVAL, warpClient));
@@ -126,21 +133,16 @@ public class MPGameScreen extends SinglePlayerScreen implements Screen, Observer
                 case UPDATE_PEERS_RECEIVED:
                     UpdateEvent updatePeersReceived = (UpdateEvent) tup.getValue(1);
                     byte[] bytes = updatePeersReceived.getUpdate();
-                    ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-                    ObjectInput in = null;
-
-                    Triplet joystickMsg = null;
+                    Object deserialized = SerializationUtils.deserialize(bytes);
 
                     try {
-                        in = new ObjectInputStream(bis);
-                        joystickMsg = (Triplet) in.readObject();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
+                        ArrayList<ArrayList<Component>> entities =
+                                (ArrayList<ArrayList<Component>>) deserialized;
+                        clientSystem.addSnapshot(entities);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
-                    Gdx.app.log(tag, joystickMsg.toString());
                     break;
                 default:
                     Gdx.app.log(tag, "Unhandled NotificationEventType: " + tup);

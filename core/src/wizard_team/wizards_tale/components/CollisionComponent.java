@@ -3,9 +3,11 @@ package wizard_team.wizards_tale.components;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.math.Rectangle;
 
+import java.io.Serializable;
+
 import wizard_team.wizards_tale.components.constants.Constants;
 
-public class CollisionComponent implements Component {
+public class CollisionComponent implements Component, Serializable {
 
     public Constants.CollidableType collidableType;
 
