@@ -7,9 +7,13 @@ import com.badlogic.ashley.core.Component;
  */
 
 public class DamagerComponent implements Component {
-    private final int damage;
+    public int damage;
 
     public DamagerComponent(int damage) {
         this.damage = damage;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 }

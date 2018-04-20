@@ -1,27 +1,22 @@
 package wizard_team.wizards_tale.systems;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.MathUtils;
 
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
-import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
-import wizard_team.wizards_tale.components.SpriteComponent;
+import wizard_team.wizards_tale.components.SpreadableComponent;
 import wizard_team.wizards_tale.components.TimedEffectComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
 
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class InputSystem extends IteratingSystem {
     private ComponentMapper<ReceiveInputComponent> inputMapper =
@@ -33,13 +28,11 @@ public class InputSystem extends IteratingSystem {
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
     private Touchpad touchpad;
-    private Button bombButton;
     private boolean bombPlaced =false;
 
     public InputSystem(Touchpad touchpad, Button bombButton) {
         super(Family.all(ReceiveInputComponent.class, PositionComponent.class).get());
         this.touchpad = touchpad;
-        this.bombButton = bombButton;
     }
 
     private static float maxVel = 50;
@@ -88,11 +81,12 @@ public class InputSystem extends IteratingSystem {
         // If bomb button has been pressed, place a bomb at current position
         if (bombPlaced) {
             Entity bomb = new Entity();
-
-            bomb.add(new TimedEffectComponent(Constants.DEFAULT_DETONATION_TIME, Constants.EffectTypes.SPREAD));
-            bomb.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
+            //TODO: get this from bomblayer component
+            //bomb.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
             //Sets bombs cell to be within the current cell of player
+            bomb.add(new SpreadableComponent(Constants.DEFAULT_BOMB_DEPTH));
             bomb.add(new CellPositionComponent(cell.x, cell.y));
+            bomb.add(new TimedEffectComponent(Constants.DEFAULT_DETONATION_TIME, Constants.EffectTypes.SPREAD));
 
             this.getEngine().addEntity(bomb);
             this.bombPlaced = false;

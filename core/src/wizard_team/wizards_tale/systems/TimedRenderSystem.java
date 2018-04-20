@@ -5,22 +5,23 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
-import wizard_team.wizards_tale.components.PositionComponent;
+
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.TimedEffectComponent;
+import wizard_team.wizards_tale.components.constants.Constants;
 
 /**
  * Created by synnovehalle on 17/04/2018.
  */
 
 //The bomb render reperesent the bomb system counts down the
-public class BombRenderSystem extends IteratingSystem {
-    private final Texture bombTexture;
+public class TimedRenderSystem extends IteratingSystem {
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
 
@@ -29,30 +30,40 @@ public class BombRenderSystem extends IteratingSystem {
             ComponentMapper.getFor(TimedEffectComponent.class);
 
 
-    private ComponentMapper<DamagerComponent> damageMapper =
-            ComponentMapper.getFor(DamagerComponent.class);
+    private ComponentMapper<SpriteComponent> spriteMapper =
+            ComponentMapper.getFor(SpriteComponent.class);
 
+    private SpriteBatch batch;
 
-    public BombRenderSystem(SpriteBatch batch, Texture bombTexture) {
-        super(Family.all(CellPositionComponent.class, TimedEffectComponent.class, DamagerComponent.class).get());
-        this.bombTexture = bombTexture;
+    public TimedRenderSystem(SpriteBatch batch) {
+        super(Family.all(CellPositionComponent.class, TimedEffectComponent.class, SpriteComponent.class).get());
+        this.batch = batch;
     }
 
 
     public void processEntity(Entity e, float dt) {
+
         CellPositionComponent cellPos = cellPosMapper.get(e);
         TimedEffectComponent timeEffect = timeMapper.get(e);
-        DamagerComponent damage = damageMapper.get(e);
 
+        SpriteComponent spriteComponent = spriteMapper.get(e);
+        Sprite sprite = spriteComponent.sprite;
 
         if (timeEffect.time != 0) {
-            e.add(new SpriteComponent(bombTexture));
-            e.add(new PositionComponent(cellPos.x*100, cellPos.y*100));
+            int pos_x = (int)(cellPos.x*Constants.CELL_WIDTH);
+            int pos_y = (int)(cellPos.y*Constants.CELL_HEIGHT);
+            sprite.setX(pos_x);
+            sprite.setY(pos_y);
+            batch.begin();
+            batch.draw(sprite.getTexture(), pos_x, pos_y);
+            batch.end();
+
             timeEffect.time = timeEffect.time - 1;
 
         } else {
-            //TODO: trigger explosion
-            getEngine().removeEntity(e);
+            //Remove the rendering components
+            e.remove(TimedEffectComponent.class);
+            e.remove(SpriteComponent.class);
         }
 
     }
