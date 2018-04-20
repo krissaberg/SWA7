@@ -66,6 +66,7 @@ public class SinglePlayerScreen implements Screen {
     private Texture whiteMageTex;
     private Texture blackMageTex;
     private Texture wallTexture;
+    private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
     private InputSystem inputSystem;
@@ -88,6 +89,7 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/mountain.png", Texture.class);
         assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.load("sprites/explosion.png", Texture.class);
+        assetManager.load("sprites/soft_wall.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -95,6 +97,7 @@ public class SinglePlayerScreen implements Screen {
         wallTexture = assetManager.get("sprites/mountain.png", Texture.class);
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
+        softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -147,11 +150,13 @@ public class SinglePlayerScreen implements Screen {
             for (int y = 0; y < 5; y++) {
                 Entity tile = new Entity();
                 tile.add(new CellBoundaryComponent(rect));
+
                 tile.add(new CellPositionComponent(
                         (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_WIDTH)));
 
                 if (x % 2 == 0 && y % 2 == 0) {
                     tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
+
                 } else {
                     tile.add(new CollisionComponent(Constants.CollidableType.HARD));
                 }

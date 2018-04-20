@@ -37,6 +37,9 @@ public class ExplosionSystem extends IteratingSystem {
         SpreadableComponent spreadable = spreadMapper.get(e);
         TimedEffectComponent timedEffect = effectMapper.get(e);
 
+        Family family = Family.all().get();
+
+
         if (timedEffect.time != 0) {
             e.add(new SpriteComponent(explosionTexture));
         }
