@@ -110,8 +110,10 @@ public class SinglePlayerScreen implements Screen {
         Entity playerCharacter = new Entity();
 
         //Positions
-        playerCharacter.add(new PositionComponent(100, 200));
-        playerCharacter.add(new CellPositionComponent(0,0));
+
+        //Start player in top left
+        playerCharacter.add(new PositionComponent(0, (Constants.MAP_Y-1)*Constants.CELL_HEIGHT));
+        playerCharacter.add(new CellPositionComponent(0, Constants.MAP_Y));
 
         playerCharacter.add(new VelocityComponent());
         playerCharacter.add(new SpriteComponent(blackMageTex));
@@ -135,30 +137,33 @@ public class SinglePlayerScreen implements Screen {
             eng.addEntity(walker);
         }
 
-        // Walls
-        Entity wall = new Entity();
-        wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
-        wall.add(new PositionComponent(200, 200));
-        wall.add(new SpriteComponent(wallTexture));
-        wall.add(new CollisionComponent(Constants.CollidableType.HARD));
-        eng.addEntity(wall);
-
         // Cells
         Rectangle rect = new Rectangle(
                 0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
-        for (int x = 0; x<5; x++) {
-            for (int y = 0; y < 5; y++) {
+
+        for (int x = 0; x < Constants.MAP_X; x++) {
+            for (int y = 0; y < Constants.MAP_Y; y++) {
+                //Avoid top
+                if (x==0 & y==Constants.MAP_Y-1) {continue;}
                 Entity tile = new Entity();
-                tile.add(new CellBoundaryComponent(rect));
 
                 tile.add(new CellPositionComponent(
-                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_WIDTH)));
+                        (int) (x), (int) (y)));
+
+                //Collision
+                tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
+                tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+
+                //For rendering
+                tile.add(new PositionComponent(
+                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
 
                 if (x % 2 == 0 && y % 2 == 0) {
-                    tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
+                    tile.add(new SpriteComponent(wallTexture));
 
                 } else {
-                    tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+                    tile.add(new SpriteComponent(softWallTexture));
+
                 }
                 eng.addEntity(tile);
             }
