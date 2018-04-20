@@ -97,10 +97,11 @@ public class BombSystem extends IteratingSystem {
         if (timeEffect.effect == Constants.EffectTypes.SPREAD) {
             // Check if it is bomb detonation time
             if (timeEffect.time == 0) {
-                spread(depth,1,0);
-                spread(depth,-1,0);
-                spread(depth, 0,1);
-                spread(depth, 0,-1);
+                spread(2,0,0); // In origin
+                spread(depth,1,0); // Right
+                spread(depth,-1,0); // Left
+                spread(depth, 0,1); // Up
+                spread(depth, 0,-1); // Down
             } else {
                 // If not detonation, render as bomb, time down handled by TimedRenderSystem
                 e.add(new SpriteComponent(this.bombTexture));
