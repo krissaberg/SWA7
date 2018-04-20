@@ -30,7 +30,7 @@ import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
-import wizard_team.wizards_tale.components.CollisionComponent;
+import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
@@ -122,11 +122,11 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new ReceiveInputComponent());
         playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
                 blackMageTex.getWidth(), blackMageTex.getHeight())));
-        playerCharacter.add(new CollisionComponent(Constants.CollidableType.SOFT));
+        playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
         playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
         eng.addEntity(playerCharacter);
 
-        // Random walkers
+        /* Random walkers
         for (int i = 0; i < 10; i++) {
             Entity walker = new Entity();
             walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
@@ -135,9 +135,10 @@ public class SinglePlayerScreen implements Screen {
             walker.add(new VelocityComponent());
             walker.add(new BoundRectComponent(new Rectangle(0, 0,
                     whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollisionComponent(Constants.CollidableType.SOFT));
+            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
             eng.addEntity(walker);
         }
+        */
 
         // Tiles
         Rectangle rect = new Rectangle(
@@ -226,17 +227,18 @@ public class SinglePlayerScreen implements Screen {
     public void createMap(Engine eng){
         for (int x = 0; x < Constants.MAP_X; x++) {
             for (int y = 0; y < Constants.MAP_Y; y++) {
-
-                //Don't place something on top left or bottom right (player start)
-                if (x==0 & y==Constants.MAP_Y-1 || x==Constants.MAP_X & y==0) {continue;}
                 Entity tile = new Entity();
                 tile.add(new CellPositionComponent(x,y));
                 tile.add(new DestroyableComponent(0));
-                tile.add(new CollideableComponent(0));
+
+                //Don't place something on top left or bottom right (player start)
+                if (x==0 & y==Constants.MAP_Y-1 || x==Constants.MAP_X & y==0) {
+                    tile.add(new CollideableComponent(0, Constants.CollideableType.NONE));
+                    continue;
+                }
 
                 //Collision
-                //tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
-                //tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+                tile.add(new BoundRectComponent(new Rectangle(x*Constants.CELL_WIDTH, y*Constants.CELL_HEIGHT, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
 
                 //For rendering requires pos
                 tile.add(new PositionComponent(
@@ -246,12 +248,12 @@ public class SinglePlayerScreen implements Screen {
                 if (x % 2 == 0 && y % 2 == 0) {
                     // Place hard blocks
                     tile.add(new SpriteComponent(wallTexture));
-                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT));
+                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT,Constants.CollideableType.HARD));
                 } else {
                     // Place soft blocks
                     tile.add(new SpriteComponent(softWallTexture));
                     tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
-                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT));
+                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
                 }
                 eng.addEntity(tile);
             }

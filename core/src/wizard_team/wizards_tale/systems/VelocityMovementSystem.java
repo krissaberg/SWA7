@@ -3,12 +3,12 @@ package wizard_team.wizards_tale.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.systems.IteratingSystem;
 
-import wizard_team.wizards_tale.components.CollidableType;
+import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 import com.badlogic.ashley.core.Component;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
-import wizard_team.wizards_tale.components.CollisionComponent;
+import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
@@ -28,8 +28,8 @@ public class VelocityMovementSystem extends IteratingSystem {
   private ComponentMapper<BoundRectComponent> boundMapper =
           ComponentMapper.getFor(BoundRectComponent.class);
 
-  private ComponentMapper<CollisionComponent> collisionMapper =
-          ComponentMapper.getFor(CollisionComponent.class);
+  private ComponentMapper<CollideableComponent> collisionMapper =
+          ComponentMapper.getFor(CollideableComponent.class);
 
   public VelocityMovementSystem() {
     super(Family.all(PositionComponent.class, VelocityComponent.class).get());
@@ -38,10 +38,10 @@ public class VelocityMovementSystem extends IteratingSystem {
   private boolean cantPassThrough(Entity e1, Entity e2) {
     // Soft entities can pass through other soft entities
     if(collisionMapper.has(e1) && collisionMapper.has(e2)) {
-      CollisionComponent coll1 = collisionMapper.get(e1);
-      CollisionComponent coll2 = collisionMapper.get(e2);
-      return coll1.collidableType == Constants.CollidableType.HARD ||
-              coll2.collidableType == Constants.CollidableType.HARD;
+      CollideableComponent coll1 = collisionMapper.get(e1);
+      CollideableComponent coll2 = collisionMapper.get(e2);
+      return coll1.collidableType == Constants.CollideableType.HARD ||
+              coll2.collidableType == Constants.CollideableType.HARD;
     }
     return false;
   }
