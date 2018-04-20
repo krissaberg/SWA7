@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 
 import wizard_team.wizards_tale.components.CellPositionComponent;
+import wizard_team.wizards_tale.components.DamagerComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpreadableComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
@@ -26,7 +27,7 @@ public class ExplosionSystem extends IteratingSystem {
             ComponentMapper.getFor(TimedEffectComponent.class);
 
     public ExplosionSystem(Texture explosionTexture) {
-        super(Family.all(CellPositionComponent.class, SpreadableComponent.class).get());
+        super(Family.all(DamagerComponent.class, CellPositionComponent.class, SpreadableComponent.class).get());
         this.explosionTexture = explosionTexture;
     }
 

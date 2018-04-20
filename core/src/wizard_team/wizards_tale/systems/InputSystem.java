@@ -8,6 +8,7 @@ import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
+import wizard_team.wizards_tale.components.SpreadableComponent;
 import wizard_team.wizards_tale.components.TimedEffectComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
@@ -80,8 +81,10 @@ public class InputSystem extends IteratingSystem {
         // If bomb button has been pressed, place a bomb at current position
         if (bombPlaced) {
             Entity bomb = new Entity();
-            bomb.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
+            //TODO: get this from bomblayer component
+            //bomb.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
             //Sets bombs cell to be within the current cell of player
+            bomb.add(new SpreadableComponent(Constants.DEFAULT_BOMB_DEPTH));
             bomb.add(new CellPositionComponent(cell.x, cell.y));
             bomb.add(new TimedEffectComponent(Constants.DEFAULT_DETONATION_TIME, Constants.EffectTypes.SPREAD));
 
