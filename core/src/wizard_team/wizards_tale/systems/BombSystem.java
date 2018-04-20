@@ -17,6 +17,8 @@ import wizard_team.wizards_tale.components.constants.Constants;
 
 /**
  * Created by synnovehalle on 18/04/2018.
+ *
+ * The bomb system is in charge of rendering a bomb and starting the explosion effect by adding
  */
 
 public class BombSystem extends IteratingSystem {
@@ -40,14 +42,17 @@ public class BombSystem extends IteratingSystem {
         this.bombTexture = bombTexture;
     }
 
-
+    // Handles spreading of an explosion in a certain direction. I.e. left would be dx=-1, dy=0
     public void spread(int start_depth, int dx, int dy) {
         for (int i = 1; i < start_depth; i++) {
-            //still flow
+            // Check the modified depth
             int new_depth = modifiedDepth(dx, dy);
+            // If there is no more flow, return
             if (new_depth== 0) {
                 return;
-            } else {
+            }
+            // If there is flow, keep creating an explosion
+            else {
                 Entity explosion = new Entity();
                 explosion.add(new CellPositionComponent(start_x + i*dx, start_y + i*dy));
                 explosion.add(new SpreadableComponent(new_depth));
@@ -55,10 +60,10 @@ public class BombSystem extends IteratingSystem {
                 explosion.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
                 getEngine().addEntity(explosion);
             }
-
         }
     }
 
+    // An explosion has a depth (like minecraft water flow, a block has a height. Reduce flow by height.
     public int modifiedDepth(int dx, int dy) {
         Family collideableFam = Family.all(CollideableComponent.class).get();
 
@@ -75,7 +80,6 @@ public class BombSystem extends IteratingSystem {
                     return depth - height;
                 }
             }
-
         }
         return 0;
     }
@@ -85,19 +89,20 @@ public class BombSystem extends IteratingSystem {
         SpreadableComponent spread = spreadMapper.get(e);
         TimedEffectComponent timeEffect = timeEffectMapper.get(e);
 
-
         this.start_x = cellPos.x;
         this.start_y = cellPos.y;
         this.depth = spread.getdepth();
 
+        // Only bomb-explosions (the first) is a spreader type the rest are vanish types
         if (timeEffect.effect == Constants.EffectTypes.SPREAD) {
+            // Check if it is bomb detonation time
             if (timeEffect.time == 0) {
                 spread(depth,1,0);
                 spread(depth,-1,0);
                 spread(depth, 0,1);
                 spread(depth, 0,-1);
             } else {
-                // Render as bomb, time down handled by TimedRenderSystem
+                // If not detonation, render as bomb, time down handled by TimedRenderSystem
                 e.add(new SpriteComponent(this.bombTexture));
             }
 

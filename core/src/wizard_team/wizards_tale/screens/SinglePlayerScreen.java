@@ -139,45 +139,12 @@ public class SinglePlayerScreen implements Screen {
             eng.addEntity(walker);
         }
 
-        // Cells
+        // Tiles
         Rectangle rect = new Rectangle(
                 0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
 
-        for (int x = 0; x < Constants.MAP_X; x++) {
-            for (int y = 0; y < Constants.MAP_Y; y++) {
-                //Avoid top
-                if (x==0 & y==Constants.MAP_Y-1) {continue;}
-                Entity tile = new Entity();
-
-                tile.add(new CellPositionComponent(x,y));
-                tile.add(new DestroyableComponent(0));
-                tile.add(new CollideableComponent(0));
-
-                //Collision
-                //tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
-                //tile.add(new CollisionComponent(Constants.CollidableType.HARD));
-
-                //For rendering
-                tile.add(new PositionComponent(
-                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
-
-                if (x % 2 == 0 && y % 2 == 0) {
-                    tile.add(new SpriteComponent(wallTexture));
-                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT));
-
-                } else {
-                    tile.add(new SpriteComponent(softWallTexture));
-                    tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
-                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT));
-
-
-                }
-                eng.addEntity(tile);
-            }
-        }
-
-
-
+        // MAP_X and MAP_Y define the Map-grid
+        createMap(eng);
 
         // Systems
         eng.addSystem(new RandomWalkerSystem());
@@ -254,5 +221,40 @@ public class SinglePlayerScreen implements Screen {
     public void resize(int width, int height) {
         viewport.update(width, height, true);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+    }
+
+    public void createMap(Engine eng){
+        for (int x = 0; x < Constants.MAP_X; x++) {
+            for (int y = 0; y < Constants.MAP_Y; y++) {
+
+                //Don't place something on top left or bottom right (player start)
+                if (x==0 & y==Constants.MAP_Y-1 || x==Constants.MAP_X & y==0) {continue;}
+                Entity tile = new Entity();
+                tile.add(new CellPositionComponent(x,y));
+                tile.add(new DestroyableComponent(0));
+                tile.add(new CollideableComponent(0));
+
+                //Collision
+                //tile.add(new BoundRectComponent(new Rectangle(x, y, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
+                //tile.add(new CollisionComponent(Constants.CollidableType.HARD));
+
+                //For rendering requires pos
+                tile.add(new PositionComponent(
+                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
+
+                // Place blocks
+                if (x % 2 == 0 && y % 2 == 0) {
+                    // Place hard blocks
+                    tile.add(new SpriteComponent(wallTexture));
+                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT));
+                } else {
+                    // Place soft blocks
+                    tile.add(new SpriteComponent(softWallTexture));
+                    tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT));
+                }
+                eng.addEntity(tile);
+            }
+        }
     }
 }

@@ -61,10 +61,9 @@ public class TimedRenderSystem extends IteratingSystem {
             timeEffect.time = timeEffect.time - 1;
 
         } else {
-            //Remove the entity
+            //Remove the rendering components
             e.remove(TimedEffectComponent.class);
             e.remove(SpriteComponent.class);
-            //getEngine().removeEntity(e);
         }
 
     }
