@@ -30,6 +30,7 @@ import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.CollisionComponent;
+import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
@@ -163,6 +164,7 @@ public class SinglePlayerScreen implements Screen {
 
                 } else {
                     tile.add(new SpriteComponent(softWallTexture));
+                    tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
 
                 }
                 eng.addEntity(tile);

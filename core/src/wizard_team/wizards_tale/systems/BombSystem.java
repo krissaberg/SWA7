@@ -54,6 +54,7 @@ public class BombSystem extends IteratingSystem {
                     Entity explosion_up = new Entity();
                     Entity explosion_down = new Entity();
 
+                    //TODO: depth/movement check
                     explosion_right.add(new CellPositionComponent(start_x + i, start_y));
                     explosion_left.add(new CellPositionComponent(start_x - i, start_y));
                     explosion_up.add(new CellPositionComponent(start_x, start_y + i));
