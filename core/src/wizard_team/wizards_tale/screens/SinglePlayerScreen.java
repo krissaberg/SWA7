@@ -14,7 +14,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -69,14 +68,12 @@ public class SinglePlayerScreen implements Screen {
     private Button bombButton;
     private float gameTimeLeft;
 
-  Engine engine;
-  Touchpad touchpad;
-
     private Texture whiteMageTex;
     private Texture blackMageTex;
     private Texture wallTexture;
     private Texture bombTexture;
     private InputSystem inputSystem;
+    private Label gameTime;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -105,19 +102,20 @@ public class SinglePlayerScreen implements Screen {
         this.engine = createEngine();
     }
 
-  public void setGameTimeLeft(float gameTimeLeft) {
-    this.gameTimeLeft = gameTimeLeft;
-  }
+    public void setGameTimeLeft(float gameTimeLeft) {
+        this.gameTimeLeft = gameTimeLeft;
+        gameTime.setText("" + Math.round(gameTimeLeft));
+    }
 
-  private Engine createEngine() {
-    Engine eng = new Engine();
+    private Engine createEngine() {
+        Engine eng = new Engine();
 
         // Player character entity
         Entity playerCharacter = new Entity();
 
         //Positions
         playerCharacter.add(new PositionComponent(100, 200));
-        playerCharacter.add(new CellPositionComponent(0,0));
+        playerCharacter.add(new CellPositionComponent(0, 0));
 
         playerCharacter.add(new VelocityComponent());
         playerCharacter.add(new SpriteComponent(blackMageTex));
@@ -140,20 +138,13 @@ public class SinglePlayerScreen implements Screen {
             eng.addEntity(walker);
         }
 
-    // Clock for Game Cycle entity
-    Entity clock = new Entity();
-    clock.add(new CounterComponent(30));
-    clock.add(new GameTimeComponent());
-    eng.addEntity(clock);
+        // Clock for Game Cycle entity
+        Entity clock = new Entity();
+        clock.add(new CounterComponent(30));
+        clock.add(new GameTimeComponent());
+        eng.addEntity(clock);
 
 
-    // Systems
-    eng.addSystem(new RandomWalkerSystem());
-    eng.addSystem(new VelocityMovementSystem());
-    eng.addSystem(new RenderSystem(spriteBatch));
-    eng.addSystem(new InputSystem(touchpad));
-    eng.addSystem(new CountDownSystem());
-    eng.addSystem(new GameCycleSystem(game, this));
         // Walls
         Entity wall = new Entity();
         wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
@@ -165,7 +156,7 @@ public class SinglePlayerScreen implements Screen {
         // Cells
         Rectangle rect = new Rectangle(
                 0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
-        for (int x = 0; x<5; x++) {
+        for (int x = 0; x < 5; x++) {
             for (int y = 0; y < 5; y++) {
                 Entity tile = new Entity();
                 tile.add(new CellBoundaryComponent(rect));
@@ -180,9 +171,10 @@ public class SinglePlayerScreen implements Screen {
                 eng.addEntity(tile);
             }
         }
-
-
         // Systems
+        eng.addSystem(new CountDownSystem());
+        eng.addSystem(new GameCycleSystem(game, this));
+
         eng.addSystem(new RandomWalkerSystem());
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
@@ -206,26 +198,21 @@ public class SinglePlayerScreen implements Screen {
         rootTable.setDebug(true);
         rootTable.left().bottom();
 
-    Touchpad touchpad = new Touchpad(5, skin);
-    rootTable.add(touchpad).bottom().left();
-    this.touchpad = touchpad;
-
-    //Show gametime
-    Label gameTime = new Label(gameTimeLeft + "", skin);
-    rootTable.add(gameTime).bottom().center();
-
-    rootTable.add(new Table()).expandX();
-        Touchpad touchpad = new Touchpad(15, skin);
+        Touchpad touchpad = new Touchpad(5, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
-        rootTable.add(new Table()).expandX();
+        //rootTable.add(new Table()).expandX();
+
+        //Show gametime
+        gameTime = new Label(gameTimeLeft + "", skin);
+        rootTable.add(gameTime).bottom().center().expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
         this.bombButton = bombButton;
         rootTable.add(bombButton).bottom().right();
         this.bombButton.addListener(new ChangeListener() {
             @Override
-            public void changed (ChangeEvent event, Actor actor) {
+            public void changed(ChangeEvent event, Actor actor) {
                 inputSystem.setBombButtonPressed();
             }
         });

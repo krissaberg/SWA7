@@ -29,7 +29,7 @@ public class WizardsTaleGame extends Game {
     skin = assetManager.get("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
 //    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
-    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
+    setScreen(new MainMenuScreen(this));
     setScreen(new MainMenuScreen(this));
   }
 
