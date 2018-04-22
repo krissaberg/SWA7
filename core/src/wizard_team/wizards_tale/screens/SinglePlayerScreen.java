@@ -84,6 +84,7 @@ public class SinglePlayerScreen implements Screen {
     private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
+    private Texture playbackground;
 
 
     private Texture speedTexture;
@@ -122,6 +123,7 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/powerup_power.png", Texture.class);
         assetManager.load("sprites/powerup_range.png", Texture.class);
         assetManager.load("sprites/powerup_amount.png", Texture.class);
+        assetManager.load("playbackground.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -130,11 +132,11 @@ public class SinglePlayerScreen implements Screen {
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
-
         speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
         powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
         rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
         amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
+        playbackground = assetManager.get("playbackground.png", Texture.class);
 
 
 
@@ -270,13 +272,16 @@ public class SinglePlayerScreen implements Screen {
         //TODO Update server if player with your username is dead.
         //^ The HP of player entity == 0 when dead.
         if (!isAlive) {
-            game.setScreen(new FinishedScreen(game, "GAME OVER!"));
+            game.setScreen(new FinishedScreen(game, "GAME OVER!", 4));
+            //TODO Find remaining players in multiplayerScreen and pass it to "place"
         }
 
         engine.update(dt);
-
         stage.act(dt);
         stage.draw();
+        //spriteBatch.begin();
+        //spriteBatch.draw(playbackground, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        //spriteBatch.end();
     }
 
     public void resize(int width, int height) {
