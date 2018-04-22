@@ -22,7 +22,7 @@ public class Constants {
                     "NNNNN\n" +
                     "NHNHN\n" +
                     "NNNNN";
-    public static final int DEFAULT_DETONATION_TIME = 10;
+    public static final int DEFAULT_DETONATION_TIME = 100;
     public static final int DEFAULT_EXPLOSION_TIME = 5;
     public static final int POWERUP_TIME = 50; //how long the powerup is in play, should be less than explosion time (hacky)
 
@@ -34,7 +34,7 @@ public class Constants {
     public static final int SOFT_BLOCK_HEIGHT = 1;
 
     public static final int DEFAULT_BLOCK_HP = 1;
-    public static final int DEFAULT_PLAYER_HP = 1;
+    public static final int DEFAULT_PLAYER_HP = 10;
     public static final int DEFAULT_MAX_BOMBS = 3;
     public static int POWERUP_KEEP_TIME = 50;
 

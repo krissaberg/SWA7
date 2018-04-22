@@ -12,10 +12,12 @@ import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PowerupComponent;
+import wizard_team.wizards_tale.components.ScoreComponent;
 import wizard_team.wizards_tale.components.SpreadableComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.TimedEffectComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
+import wizard_team.wizards_tale.screens.SinglePlayerScreen;
 
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,6 +25,7 @@ import com.badlogic.gdx.graphics.Texture;
 public class ExplosionSystem extends IteratingSystem {
     private final Texture explosionTexture;
     private final Texture bombTexture;
+    private SinglePlayerScreen screen;
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
 
@@ -35,16 +38,20 @@ public class ExplosionSystem extends IteratingSystem {
     private ComponentMapper<DamagerComponent> damageMapper =
             ComponentMapper.getFor(DamagerComponent.class);
 
+    private ComponentMapper<ScoreComponent> scoreMapper =
+            ComponentMapper.getFor(ScoreComponent.class);
+
     private ComponentMapper<DestroyableComponent> destroyableMapper =
             ComponentMapper.getFor(DestroyableComponent.class);
 
     private ComponentMapper<CollideableComponent> collideableMapper =
             ComponentMapper.getFor(CollideableComponent.class);
 
-    public ExplosionSystem(Texture bombTexture, Texture explosionTexture) {
+    public ExplosionSystem(Texture bombTexture, Texture explosionTexture, SinglePlayerScreen screen) {
         super(Family.all(DamagerComponent.class, TimedEffectComponent.class).get());
         this.bombTexture = bombTexture;
         this.explosionTexture = explosionTexture;
+        this.screen = screen;
     }
 
     // Handles spreading of an explosion in a certain direction. I.e. left would be dx=-1, dy=0
@@ -61,6 +68,8 @@ public class ExplosionSystem extends IteratingSystem {
                 int collideable_y = collideablePos.y;
                 int height = collideableMapper.get(collideable).height;
 
+                // Check if player
+
                 // If the collidable is taller, we should stop
                 if (collideable_x == x + dx & collideable_y == y + dy) {
                     if (height > depth) {
@@ -75,6 +84,8 @@ public class ExplosionSystem extends IteratingSystem {
                         collideable.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
                     }
                 }
+                // Check if player is hit
+
             }
         }
     }
@@ -128,6 +139,19 @@ public class ExplosionSystem extends IteratingSystem {
 
                         //Check if we have exploded over a destroyable
                         if (destroyable_x == cellPos.x & destroyable_y == cellPos.y) {
+                            // if hp=10 a player is hit and killed
+                            if (destroyableComponent.hp == 10) {
+                                ScoreComponent score = scoreMapper.get(destroyable);
+                                destroyableComponent.hp = 0;
+                                score.deaths++;
+                                //Update screen
+                                screen.isAlive = false;
+                                //Remove player sprite and create regular tile
+                                destroyable.remove(SpriteComponent.class);
+                                destroyable.remove(CollideableComponent.class);
+                                destroyable.add(new DestroyableComponent(0));
+                                destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
+                            }
                             destroyableComponent.hp -= damage;
                             if (destroyableComponent.hp < 0) {
                                 destroyable.remove(SpriteComponent.class);
