@@ -41,7 +41,7 @@ public class MainMenuScreen implements Screen {
     this.stage = createStage(viewport);
     Gdx.input.setInputProcessor(this.stage);
 
-    this.backgroundTex = assetManager.get("menu_background.png", Texture.class);
+    this.backgroundTex = assetManager.get("menuscreen.png", Texture.class);
   }
 
   private Stage createStage(Viewport viewport) {
@@ -50,7 +50,6 @@ public class MainMenuScreen implements Screen {
     Table rootTable = new Table();
     stage.addActor(rootTable);
     rootTable.setFillParent(true);
-    rootTable.setDebug(true);
 
     Button startButton = new TextButton("New Game", skin);
     rootTable.add(startButton);

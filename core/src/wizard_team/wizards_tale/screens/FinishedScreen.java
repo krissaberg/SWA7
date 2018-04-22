@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -36,8 +37,9 @@ public class FinishedScreen implements Screen{
     AssetManager assetManager;
     Viewport viewport;
     Camera camera;
+    int place;
 
-    public FinishedScreen(WizardsTaleGame game, String message){
+    public FinishedScreen(WizardsTaleGame game, String message, int place){
         this.message = message;
         this.assetManager = game.getAssetManager();
         this.game = game;
@@ -47,9 +49,26 @@ public class FinishedScreen implements Screen{
         this.viewport = new FitViewport(800, 600, this.camera);
         viewport.apply(true);
         this.stage = createStage(viewport);
+        this.place = place;
         Gdx.input.setInputProcessor(this.stage);
 
-        this.backgroundTex = assetManager.get("menu_background.png", Texture.class);
+        this.backgroundTex = assetManager.get("menuscreen.png", Texture.class);
+    }
+
+    private String placeString(int place){
+        int realPlace = place +1;
+        if (realPlace == 1){
+            return "1st place";
+        }
+        else if(realPlace == 2){
+            return "2nd place";
+        }
+        else if (realPlace == 3){
+            return "3rd place";
+        }
+        else{
+            return realPlace + "th place";
+        }
     }
 
     private Stage createStage(Viewport viewport) {
@@ -58,8 +77,15 @@ public class FinishedScreen implements Screen{
         Table rootTable = new Table();
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
-        rootTable.setDebug(true);
 
+        Label messageLabel = new Label(message, skin);
+        Label placeLabel = new Label( placeString(place), skin);
+        messageLabel.setFontScale((float) 1.5);
+        placeLabel.setFontScale((float) 1.5);
+        rootTable.add(messageLabel);
+        rootTable.row();
+        rootTable.add(placeLabel);
+        rootTable.row();
         Button startButton = new TextButton("Return to main menu", skin);
         rootTable.add(startButton);
         startButton.addListener(
@@ -85,8 +111,9 @@ public class FinishedScreen implements Screen{
 
         spriteBatch.begin();
         spriteBatch.draw(backgroundTex, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
-        font.getData().setScale(2);
-        font.draw(spriteBatch, message, viewport.getWorldHeight()/2, viewport.getWorldWidth()/2 + 20);
+        //font.getData().setScale(2);
+        //font.draw(spriteBatch, message, message.length() +viewport.getWorldHeight()/2, viewport.getWorldWidth()/2 + 20);
+        //font.draw(spriteBatch, placeString(place), viewport.getWorldHeight()/2 , viewport.getWorldWidth()/2 -10);
         spriteBatch.end();
 
         stage.act(dt);
