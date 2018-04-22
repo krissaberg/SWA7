@@ -140,7 +140,7 @@ public class SinglePlayerScreen implements Screen {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(30));
+        clock.add(new CounterComponent(100));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
@@ -192,20 +192,25 @@ public class SinglePlayerScreen implements Screen {
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
 
+        Table topTable = new Table();
+        stage.addActor(topTable);
+        topTable.setFillParent(true);
+        topTable.center().top();
+        //Show gametime
+        gameTime = new Label(gameTimeLeft + "", skin);
+        gameTime.setFontScale(3);
+        topTable.add(gameTime);
+
         Table rootTable = new Table();
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
-        rootTable.setDebug(true);
+        //rootTable.setDebug(true);
         rootTable.left().bottom();
 
         Touchpad touchpad = new Touchpad(5, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
-        //rootTable.add(new Table()).expandX();
-
-        //Show gametime
-        gameTime = new Label(gameTimeLeft + "", skin);
-        rootTable.add(gameTime).bottom().center().expandX();
+        rootTable.add(new Table()).expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
         this.bombButton = bombButton;
