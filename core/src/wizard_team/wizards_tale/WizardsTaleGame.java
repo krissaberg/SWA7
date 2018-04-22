@@ -7,6 +7,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
+
 import wizard_team.wizards_tale.screens.MainMenuScreen;
 import wizard_team.wizards_tale.screens.SinglePlayerScreen;
 
@@ -15,14 +17,31 @@ public class WizardsTaleGame extends Game {
   private AssetManager assetManager;
   private Skin skin;
 
+  public WarpClient getWarpClient() {
+    return warpClient;
+  }
+
+  private WarpClient warpClient;
+
   @Override
   public void create() {
     spriteBatch = new SpriteBatch();
     assetManager = new AssetManager();
 
     // Load shared assets
-    //assetManager.load("menu_background.png", Texture.class);
     assetManager.load("menuscreen.png", Texture.class);
+    assetManager.load("menu_background.png", Texture.class);
+    assetManager.load("playbackground.png", Texture.class);
+    assetManager.load("sprites/black_mage.png", Texture.class);
+    assetManager.load("sprites/bomb.png", Texture.class);
+    assetManager.load("sprites/explosion.png", Texture.class);
+    assetManager.load("sprites/mountain.png", Texture.class);
+    assetManager.load("sprites/powerup_amount.png", Texture.class);
+    assetManager.load("sprites/powerup_power.png", Texture.class);
+    assetManager.load("sprites/powerup_range.png", Texture.class);
+    assetManager.load("sprites/powerup_speed.png", Texture.class);
+    assetManager.load("sprites/soft_wall.png", Texture.class);
+    assetManager.load("sprites/white_mage.png", Texture.class);
     assetManager.load("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
     // Block until shared assets are loaded
@@ -31,15 +50,6 @@ public class WizardsTaleGame extends Game {
 
 //    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
     setScreen(new MainMenuScreen(this));
-  }
-
-  @Override
-  public void render() {
-    super.render();
-    // Gdx.gl.glClearColor(1, 0, 0, 1);
-    // Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-    // spriteBatch.begin();
-    // spriteBatch.end();
   }
 
   @Override
