@@ -4,6 +4,9 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import com.badlogic.gdx.math.Rectangle;
@@ -14,6 +17,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -72,6 +76,7 @@ public class SinglePlayerScreen implements Screen {
     private Engine engine;
     private Touchpad touchpad;
     private Button bombButton;
+    private TextButton clockbutton;
     private float gameTimeLeft;
 
     private Texture whiteMageTex;
@@ -83,7 +88,6 @@ public class SinglePlayerScreen implements Screen {
     private Texture powerupTexture;
 
     private InputSystem inputSystem;
-    private Label gameTime;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -121,7 +125,7 @@ public class SinglePlayerScreen implements Screen {
 
     public void setGameTimeLeft(float gameTimeLeft) {
         this.gameTimeLeft = gameTimeLeft;
-        gameTime.setText("" + Math.round(gameTimeLeft));
+        clockbutton.setText("" + Math.round(gameTimeLeft) + " seconds left");
     }
 
     private Engine createEngine() {
@@ -155,7 +159,7 @@ public class SinglePlayerScreen implements Screen {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(100));
+        clock.add(new CounterComponent(10));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
@@ -186,15 +190,16 @@ public class SinglePlayerScreen implements Screen {
 
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
-
         Table topTable = new Table();
         stage.addActor(topTable);
         topTable.setFillParent(true);
         topTable.center().top();
+
         //Show gametime
-        gameTime = new Label(gameTimeLeft + "", skin);
-        gameTime.setFontScale(3);
-        topTable.add(gameTime);
+        clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
+        clockbutton.setBounds(0,0, 400, 400);
+        clockbutton.setTouchable(Touchable.disabled);
+        topTable.add(clockbutton).width(200).height(50);
 
         Table rootTable = new Table();
         stage.addActor(rootTable);
