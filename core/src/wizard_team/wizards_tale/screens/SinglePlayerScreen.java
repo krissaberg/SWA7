@@ -1,5 +1,6 @@
 package wizard_team.wizards_tale.screens;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
@@ -38,6 +39,7 @@ import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
+import wizard_team.wizards_tale.components.ScoreComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 
@@ -61,6 +63,8 @@ import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
+    public boolean isAlive = true;
+
     private WizardsTaleGame game;
     private Skin skin;
     private Stage stage;
@@ -81,6 +85,8 @@ public class SinglePlayerScreen implements Screen {
     private Texture bombTexture;
     private Texture explosionTexture;
     private Texture powerupTexture;
+    private ComponentMapper<DestroyableComponent> destroyableMapper =
+            ComponentMapper.getFor(DestroyableComponent.class);
 
     private InputSystem inputSystem;
     private Label gameTime;
@@ -142,7 +148,9 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
         playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
-        //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        //TODO: put back in, handle death
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        playerCharacter.add(new ScoreComponent(0, 0));
 
         eng.addEntity(playerCharacter);
 
@@ -175,7 +183,7 @@ public class SinglePlayerScreen implements Screen {
 
         //Bomb Systems
         //eng.addSystem(new BombSystem(bombTexture));
-        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture));
+        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture, this));
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
@@ -239,6 +247,12 @@ public class SinglePlayerScreen implements Screen {
     public void render(float dt) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        //TODO Update server if player with your username is dead.
+        //^ The HP of player entity == 0 when dead.
+        if (!isAlive) {
+            System.out.println("IS DEAD");
+            //TODO Go to Game Over screen
+        }
 
         engine.update(dt);
 
@@ -286,17 +300,3 @@ public class SinglePlayerScreen implements Screen {
         }
     }
 }
-
-        /* Random walkers
-        for (int i = 0; i < 10; i++) {
-            Entity walker = new Entity();
-            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
-            walker.add(new SpriteComponent(whiteMageTex));
-            walker.add(new RandomMovementComponent(MathUtils.random(3)));
-            walker.add(new VelocityComponent());
-            walker.add(new BoundRectComponent(new Rectangle(0, 0,
-                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
-            eng.addEntity(walker);
-        }
-        */
