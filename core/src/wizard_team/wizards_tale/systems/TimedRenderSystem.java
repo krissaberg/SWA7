@@ -49,7 +49,7 @@ public class TimedRenderSystem extends IteratingSystem {
         SpriteComponent spriteComponent = spriteMapper.get(e);
         Sprite sprite = spriteComponent.sprite;
 
-        if (timeEffect.time != 0) {
+        if (timeEffect.time >= 0) {
             int pos_x = (int)(cellPos.x*Constants.CELL_WIDTH);
             int pos_y = (int)(cellPos.y*Constants.CELL_HEIGHT);
             sprite.setX(pos_x);

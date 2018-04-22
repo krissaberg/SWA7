@@ -42,6 +42,7 @@ import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
 import wizard_team.wizards_tale.systems.BombSystem;
+import wizard_team.wizards_tale.systems.PowerupSystem;
 import wizard_team.wizards_tale.systems.TimedRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
@@ -71,6 +72,8 @@ public class SinglePlayerScreen implements Screen {
     private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
+    private Texture powerupTexture;
+
     private InputSystem inputSystem;
 
     public SinglePlayerScreen(
@@ -92,6 +95,7 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.load("sprites/explosion.png", Texture.class);
         assetManager.load("sprites/soft_wall.png", Texture.class);
+        assetManager.load("sprites/powerup.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -100,6 +104,7 @@ public class SinglePlayerScreen implements Screen {
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
+        powerupTexture = assetManager.get("sprites/powerup.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -116,29 +121,16 @@ public class SinglePlayerScreen implements Screen {
         //Start player in top left
         playerCharacter.add(new PositionComponent(0, (Constants.MAP_Y-1)*Constants.CELL_HEIGHT));
         playerCharacter.add(new CellPositionComponent(0, Constants.MAP_Y));
-
         playerCharacter.add(new VelocityComponent());
         playerCharacter.add(new SpriteComponent(blackMageTex));
         playerCharacter.add(new ReceiveInputComponent());
-        playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
-                blackMageTex.getWidth(), blackMageTex.getHeight())));
+        Rectangle playerBound = new Rectangle(0, 0, blackMageTex.getWidth(), blackMageTex.getHeight());
+        playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
-        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
-        eng.addEntity(playerCharacter);
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
+        //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
-        /* Random walkers
-        for (int i = 0; i < 10; i++) {
-            Entity walker = new Entity();
-            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
-            walker.add(new SpriteComponent(whiteMageTex));
-            walker.add(new RandomMovementComponent(MathUtils.random(3)));
-            walker.add(new VelocityComponent());
-            walker.add(new BoundRectComponent(new Rectangle(0, 0,
-                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
-            eng.addEntity(walker);
-        }
-        */
+        eng.addEntity(playerCharacter);
 
         // Tiles
         Rectangle rect = new Rectangle(
@@ -159,9 +151,12 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new CellDebugRenderSystem(spriteBatch));
 
         //Bomb Systems
-        eng.addSystem(new BombSystem(bombTexture));
-        eng.addSystem(new ExplosionSystem(explosionTexture));
+        //eng.addSystem(new BombSystem(bombTexture));
+        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture));
         eng.addSystem(new TimedRenderSystem(spriteBatch));
+
+        // PU
+        eng.addSystem(new PowerupSystem(powerupTexture));
 
         return eng;
     }
@@ -231,32 +226,45 @@ public class SinglePlayerScreen implements Screen {
                 tile.add(new CellPositionComponent(x,y));
                 tile.add(new DestroyableComponent(0));
 
-                //Don't place something on top left or bottom right (player start)
-                if (x==0 & y==Constants.MAP_Y-1 || x==Constants.MAP_X & y==0) {
+                //TODO: Don't place something on top left L or bottom right L (players start)
+                if (0<=x && x<=1 & Constants.MAP_Y-2 <= y && y<= Constants.MAP_Y-1|| x==Constants.MAP_X & y==0) {
                     tile.add(new CollideableComponent(0, Constants.CollideableType.NONE));
-                    continue;
-                }
-
-                //Collision
-                tile.add(new BoundRectComponent(new Rectangle(x*Constants.CELL_WIDTH, y*Constants.CELL_HEIGHT, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
-
-                //For rendering requires pos
-                tile.add(new PositionComponent(
-                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
-
-                // Place blocks
-                if (x % 2 == 0 && y % 2 == 0) {
-                    // Place hard blocks
-                    tile.add(new SpriteComponent(wallTexture));
-                    tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT,Constants.CollideableType.HARD));
                 } else {
-                    // Place soft blocks
-                    tile.add(new SpriteComponent(softWallTexture));
-                    tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
-                    tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
+                    //Collision
+                    tile.add(new BoundRectComponent(new Rectangle(x*Constants.CELL_WIDTH, y*Constants.CELL_HEIGHT, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
+
+                    //For rendering requires pos
+                    tile.add(new PositionComponent(
+                            (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
+
+                    // Place blocks
+                    if (x % 2 == 0 && y % 2 == 0) {
+                        // Place hard blocks
+                        tile.add(new SpriteComponent(wallTexture));
+                        tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT,Constants.CollideableType.HARD));
+                    } else {
+                        // Place soft blocks
+                        tile.add(new SpriteComponent(softWallTexture));
+                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                        tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
+                    }
                 }
                 eng.addEntity(tile);
             }
         }
     }
 }
+
+        /* Random walkers
+        for (int i = 0; i < 10; i++) {
+            Entity walker = new Entity();
+            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
+            walker.add(new SpriteComponent(whiteMageTex));
+            walker.add(new RandomMovementComponent(MathUtils.random(3)));
+            walker.add(new VelocityComponent());
+            walker.add(new BoundRectComponent(new Rectangle(0, 0,
+                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
+            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
+            eng.addEntity(walker);
+        }
+        */

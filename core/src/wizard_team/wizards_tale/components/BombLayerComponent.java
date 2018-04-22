@@ -8,13 +8,18 @@ import com.badlogic.ashley.core.Component;
 
 public class BombLayerComponent implements Component {
 
-    private final int spread;
-    private final int depth;
-    private final int damage;
+    public int spread;
+    public int depth;
+    public int damage;
+    public int maxBombs;
+    public int bombsLaid;
+    public boolean laidBomb;
 
-    public BombLayerComponent(int spread, int depth, int damage) {
+    public BombLayerComponent(int spread, int depth, int damage, int maxBombs) {
         this.spread = spread;
         this.depth = depth;
         this.damage = damage;
+        this.maxBombs = maxBombs;
+        this.laidBomb = false;
     }
 }
