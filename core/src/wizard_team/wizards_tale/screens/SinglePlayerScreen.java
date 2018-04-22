@@ -250,8 +250,7 @@ public class SinglePlayerScreen implements Screen {
         //TODO Update server if player with your username is dead.
         //^ The HP of player entity == 0 when dead.
         if (!isAlive) {
-            System.out.println("IS DEAD");
-            //TODO Go to Game Over screen
+            game.setScreen(new FinishedScreen(game, "GAME OVER!"));
         }
 
         engine.update(dt);
