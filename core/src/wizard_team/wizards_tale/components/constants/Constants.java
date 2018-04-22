@@ -11,11 +11,10 @@ public class Constants {
     public static final float CELL_HEIGHT = 100f;
     public static final float CELL_WIDTH = 100f;
 
-    public static final int DEFAULT_DETONATION_TIME = 10;
 
-    //This is a testing dimension, but allows for a 4 hard blocks
-    public static final int MAP_X = 5;
-    public static final int MAP_Y = 5;
+
+    public static final int MAP_X = 8;
+    public static final int MAP_Y = 6;
 
     public static final String MAP_0 =
             "NNNNN\n" +
@@ -23,18 +22,32 @@ public class Constants {
                     "NNNNN\n" +
                     "NHNHN\n" +
                     "NNNNN";
+    public static final int DEFAULT_DETONATION_TIME = 10;
+    public static final int DEFAULT_EXPLOSION_TIME = 5;
+    public static final int POWERUP_TIME = 50; //how long the powerup is in play, should be less than explosion time (hacky)
 
-    //TODO: for testing only, remove
-    public static final int SCREEN_X  = 800;
-    public static final int SCREEN_Y = 600;
-    public static final int DEFAULT_BOMB_DAMAGE = 1;
+    public static final int DEFAULT_BOMB_RANGE = 3;
+    public static final int DEFAULT_BOMB_DEPTH = 3; //Solid blocks have a height that is over depth
+    public static final int DEFAULT_BOMB_DAMAGE = 2;
+
+    public static final int HARD_BLOCK_HEIGHT = 10;
+    public static final int SOFT_BLOCK_HEIGHT = 1;
+
+    public static final int DEFAULT_BLOCK_HP = 1;
+    public static final int DEFAULT_PLAYER_HP = 1;
+    public static final int DEFAULT_MAX_BOMBS = 3;
 
 
     public enum EffectTypes {SPREAD, VANISH};
+    public enum PowerupTypes {NOT_ASSIGNED, SPEED, BOMB_AMOUNT, NONE};
 
-    public enum CollidableType {
+
+    public enum SpreadTypes {FLOW_AROUND_OBSTACLES, FLOW_CARTESIAN, FLOW_IGNORE_OBSTACLES};
+
+    public enum CollideableType {
         HARD, // Nothing can pass through this
-        SOFT  // Soft entities can pass through other soft entities
+        SOFT,  // Soft entities can pass through other soft entities
+        NONE
     }
 
 

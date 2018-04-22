@@ -1,27 +1,24 @@
 package wizard_team.wizards_tale.systems;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.math.MathUtils;
 
+import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
-import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
-import wizard_team.wizards_tale.components.SpriteComponent;
+import wizard_team.wizards_tale.components.SpreadableComponent;
 import wizard_team.wizards_tale.components.TimedEffectComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
 
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 public class InputSystem extends IteratingSystem {
     private ComponentMapper<ReceiveInputComponent> inputMapper =
@@ -32,14 +29,17 @@ public class InputSystem extends IteratingSystem {
             ComponentMapper.getFor(VelocityComponent.class);
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
+    private ComponentMapper<BombLayerComponent> bombLayerMapper=
+            ComponentMapper.getFor(BombLayerComponent.class);
+    private ComponentMapper<DamagerComponent> damageMapper =
+            ComponentMapper.getFor(DamagerComponent.class);
+
     private Touchpad touchpad;
-    private Button bombButton;
     private boolean bombPlaced =false;
 
     public InputSystem(Touchpad touchpad, Button bombButton) {
         super(Family.all(ReceiveInputComponent.class, PositionComponent.class).get());
         this.touchpad = touchpad;
-        this.bombButton = bombButton;
     }
 
     private static float maxVel = 50;
@@ -83,23 +83,35 @@ public class InputSystem extends IteratingSystem {
             vel.v_x = 0;
         }
 
-        boolean bombOccupied = bombPlaced;
-
-        // If bomb button has been pressed, place a bomb at current position
+        // TODO: make sure right player if shared system If bomb button has been pressed, place a bomb at current position
         if (bombPlaced) {
-            Entity bomb = new Entity();
+            Family playerFamily = Family.all(BombLayerComponent.class).get();
+            ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+            Family cellFamily = Family.all(CellPositionComponent.class).exclude(BombLayerComponent.class).get();
+            ImmutableArray<Entity> cells = getEngine().getEntitiesFor(cellFamily);
+            for (Entity p : players) {
+                BombLayerComponent bombLayer = bombLayerMapper.get(p);
+                CellPositionComponent pPos = cellPosMapper.get(p);
+                    for (Entity c : cells) {
+                        CellPositionComponent cPos = cellPosMapper.get(c);
+                        if (cPos.x == pPos.x & cPos.y == pPos.y) {
+                            //Sets bombs cell to be within the current cell/tile of player
+                            c.add(new SpreadableComponent(bombLayer.spread));
+                            //inherit
+                            int damage = bombLayer.damage;
+                            c.add(new DamagerComponent(damage));
+                            // Renders bomb
+                            c.add(new TimedEffectComponent(Constants.DEFAULT_DETONATION_TIME, Constants.EffectTypes.SPREAD));
+                            bombPlaced = false;
+                            break;
+                    }
+                }
 
-            bomb.add(new TimedEffectComponent(Constants.DEFAULT_DETONATION_TIME, Constants.EffectTypes.SPREAD));
-            bomb.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
-            //Sets bombs cell to be within the current cell of player
-            bomb.add(new CellPositionComponent(cell.x, cell.y));
+            }
 
-            this.getEngine().addEntity(bomb);
-            this.bombPlaced = false;
         }
 
     }
-
     public void setBombButtonPressed() {
         bombPlaced = true;
     }

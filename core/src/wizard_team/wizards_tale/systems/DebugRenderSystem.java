@@ -12,7 +12,6 @@ import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 //import wizard_team.wizards_tale.components.SpriteComponent;
 
-//TODO: implment sprite
 public class DebugRenderSystem extends IteratingSystem {
   private ComponentMapper<CellPositionComponent> posMapper =
           ComponentMapper.getFor(CellPositionComponent.class);

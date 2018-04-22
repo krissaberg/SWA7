@@ -27,13 +27,16 @@ import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
+import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CounterComponent;
 import wizard_team.wizards_tale.components.GameTimeComponent;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
-import wizard_team.wizards_tale.components.CollisionComponent;
+import wizard_team.wizards_tale.components.CollideableComponent;
+import wizard_team.wizards_tale.components.CollideableComponent;
+import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
@@ -45,10 +48,13 @@ import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.systems.CountDownSystem;
 import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
-import wizard_team.wizards_tale.systems.BombRenderSystem;
+import wizard_team.wizards_tale.systems.BombSystem;
+import wizard_team.wizards_tale.systems.PowerupSystem;
+import wizard_team.wizards_tale.systems.TimedRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
 import wizard_team.wizards_tale.systems.CellRenderSystem;
 import wizard_team.wizards_tale.systems.CellDebugRenderSystem;
+import wizard_team.wizards_tale.systems.ExplosionSystem;
 import wizard_team.wizards_tale.systems.RenderSystem;
 import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
@@ -71,7 +77,11 @@ public class SinglePlayerScreen implements Screen {
     private Texture whiteMageTex;
     private Texture blackMageTex;
     private Texture wallTexture;
+    private Texture softWallTexture;
     private Texture bombTexture;
+    private Texture explosionTexture;
+    private Texture powerupTexture;
+
     private InputSystem inputSystem;
     private Label gameTime;
 
@@ -92,11 +102,18 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/white_mage.png", Texture.class);
         assetManager.load("sprites/mountain.png", Texture.class);
         assetManager.load("sprites/bomb.png", Texture.class);
+        assetManager.load("sprites/explosion.png", Texture.class);
+        assetManager.load("sprites/soft_wall.png", Texture.class);
+        assetManager.load("sprites/powerup.png", Texture.class);
         assetManager.finishLoading();
+
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
         whiteMageTex = assetManager.get("sprites/white_mage.png", Texture.class);
         wallTexture = assetManager.get("sprites/mountain.png", Texture.class);
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
+        explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
+        softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
+        powerupTexture = assetManager.get("sprites/powerup.png", Texture.class);
 
         // Create engine
         this.engine = createEngine();
@@ -114,29 +131,27 @@ public class SinglePlayerScreen implements Screen {
         Entity playerCharacter = new Entity();
 
         //Positions
-        playerCharacter.add(new PositionComponent(100, 200));
-        playerCharacter.add(new CellPositionComponent(0, 0));
 
+        //Start player in top left
+        playerCharacter.add(new PositionComponent(0, (Constants.MAP_Y-1)*Constants.CELL_HEIGHT));
+        playerCharacter.add(new CellPositionComponent(0, Constants.MAP_Y));
         playerCharacter.add(new VelocityComponent());
         playerCharacter.add(new SpriteComponent(blackMageTex));
         playerCharacter.add(new ReceiveInputComponent());
-        playerCharacter.add(new BoundRectComponent(new Rectangle(0, 0,
-                blackMageTex.getWidth(), blackMageTex.getHeight())));
-        playerCharacter.add(new CollisionComponent(Constants.CollidableType.SOFT));
+        Rectangle playerBound = new Rectangle(0, 0, blackMageTex.getWidth(), blackMageTex.getHeight());
+        playerCharacter.add(new BoundRectComponent(playerBound));
+        playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
+        //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+
         eng.addEntity(playerCharacter);
 
-        // Random walkers
-        for (int i = 0; i < 10; i++) {
-            Entity walker = new Entity();
-            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
-            walker.add(new SpriteComponent(whiteMageTex));
-            walker.add(new RandomMovementComponent(MathUtils.random(3)));
-            walker.add(new VelocityComponent());
-            walker.add(new BoundRectComponent(new Rectangle(0, 0,
-                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollisionComponent(Constants.CollidableType.SOFT));
-            eng.addEntity(walker);
-        }
+        // Tiles
+        Rectangle rect = new Rectangle(
+                0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
+
+        // MAP_X and MAP_Y define the Map-grid
+        createMap(eng);
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
@@ -144,33 +159,6 @@ public class SinglePlayerScreen implements Screen {
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
-
-        // Walls
-        Entity wall = new Entity();
-        wall.add(new BoundRectComponent(new Rectangle(200, 200, 100, 50)));
-        wall.add(new PositionComponent(200, 200));
-        wall.add(new SpriteComponent(wallTexture));
-        wall.add(new CollisionComponent(Constants.CollidableType.HARD));
-        eng.addEntity(wall);
-
-        // Cells
-        Rectangle rect = new Rectangle(
-                0, 0, Constants.CELL_WIDTH, Constants.CELL_HEIGHT);
-        for (int x = 0; x < 5; x++) {
-            for (int y = 0; y < 5; y++) {
-                Entity tile = new Entity();
-                tile.add(new CellBoundaryComponent(rect));
-                tile.add(new CellPositionComponent(
-                        (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_WIDTH)));
-
-                if (x % 2 == 0 && y % 2 == 0) {
-                    tile.add(new CollisionComponent(Constants.CollidableType.SOFT));
-                } else {
-                    tile.add(new CollisionComponent(Constants.CollidableType.HARD));
-                }
-                eng.addEntity(tile);
-            }
-        }
         // Systems
         eng.addSystem(new CountDownSystem());
         eng.addSystem(new GameCycleSystem(game, this));
@@ -184,7 +172,14 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new CellPositionSystem());
         eng.addSystem(new CellRenderSystem(spriteBatch));
         eng.addSystem(new CellDebugRenderSystem(spriteBatch));
-        eng.addSystem(new BombRenderSystem(spriteBatch, bombTexture));
+
+        //Bomb Systems
+        //eng.addSystem(new BombSystem(bombTexture));
+        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture));
+        eng.addSystem(new TimedRenderSystem(spriteBatch));
+
+        // PU
+        eng.addSystem(new PowerupSystem(powerupTexture));
 
         return eng;
     }
@@ -207,7 +202,7 @@ public class SinglePlayerScreen implements Screen {
         //rootTable.setDebug(true);
         rootTable.left().bottom();
 
-        Touchpad touchpad = new Touchpad(5, skin);
+        Touchpad touchpad = new Touchpad(15, skin);
         rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
         rootTable.add(new Table()).expandX();
@@ -217,7 +212,7 @@ public class SinglePlayerScreen implements Screen {
         rootTable.add(bombButton).bottom().right();
         this.bombButton.addListener(new ChangeListener() {
             @Override
-            public void changed(ChangeEvent event, Actor actor) {
+            public void changed (ChangeEvent event, Actor actor) {
                 inputSystem.setBombButtonPressed();
             }
         });
@@ -255,4 +250,53 @@ public class SinglePlayerScreen implements Screen {
         viewport.update(width, height, true);
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
     }
+
+    public void createMap(Engine eng){
+        for (int x = 0; x < Constants.MAP_X; x++) {
+            for (int y = 0; y < Constants.MAP_Y; y++) {
+                Entity tile = new Entity();
+                tile.add(new CellPositionComponent(x,y));
+                tile.add(new DestroyableComponent(0));
+
+                //TODO: Don't place something on top left L or bottom right L (players start)
+                if (0<=x && x<=1 & Constants.MAP_Y-2 <= y && y<= Constants.MAP_Y-1|| x==Constants.MAP_X & y==0) {
+                    tile.add(new CollideableComponent(0, Constants.CollideableType.NONE));
+                } else {
+                    //Collision
+                    tile.add(new BoundRectComponent(new Rectangle(x*Constants.CELL_WIDTH, y*Constants.CELL_HEIGHT, Constants.CELL_WIDTH, Constants.CELL_HEIGHT)));
+
+                    //For rendering requires pos
+                    tile.add(new PositionComponent(
+                            (int) (x * Constants.CELL_WIDTH), (int) (y * Constants.CELL_HEIGHT)));
+
+                    // Place blocks
+                    if (x % 2 == 0 && y % 2 == 0) {
+                        // Place hard blocks
+                        tile.add(new SpriteComponent(wallTexture));
+                        tile.add(new CollideableComponent(Constants.HARD_BLOCK_HEIGHT,Constants.CollideableType.HARD));
+                    } else {
+                        // Place soft blocks
+                        tile.add(new SpriteComponent(softWallTexture));
+                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                        tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
+                    }
+                }
+                eng.addEntity(tile);
+            }
+        }
+    }
 }
+
+        /* Random walkers
+        for (int i = 0; i < 10; i++) {
+            Entity walker = new Entity();
+            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
+            walker.add(new SpriteComponent(whiteMageTex));
+            walker.add(new RandomMovementComponent(MathUtils.random(3)));
+            walker.add(new VelocityComponent());
+            walker.add(new BoundRectComponent(new Rectangle(0, 0,
+                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
+            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
+            eng.addEntity(walker);
+        }
+        */
