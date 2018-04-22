@@ -135,7 +135,7 @@ public class ExplosionSystem extends IteratingSystem {
                                 //Make a regular tile hp
                                 destroyable.add(new DestroyableComponent(0));
                                 destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
-                                destroyable.add(new PowerupComponent(Constants.PowerupTypes.NONE, 0));
+                                destroyable.add(new PowerupComponent(Constants.PowerupTypes.NOT_ASSIGNED, 0));
                                 destroyable.add(new TimedEffectComponent(Constants.POWERUP_TIME, Constants.EffectTypes.VANISH));
                             }
                         }

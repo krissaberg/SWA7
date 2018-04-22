@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -72,7 +73,11 @@ public class SinglePlayerScreen implements Screen {
     private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
-    private Texture powerupTexture;
+
+    private Texture speedTexture;
+    private Texture rangeTexture;
+    private Texture powerTexture;
+    private Texture amountTexture;
 
     private InputSystem inputSystem;
 
@@ -95,7 +100,11 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.load("sprites/explosion.png", Texture.class);
         assetManager.load("sprites/soft_wall.png", Texture.class);
-        assetManager.load("sprites/powerup.png", Texture.class);
+
+        assetManager.load("sprites/powerup_speed.png", Texture.class);
+        assetManager.load("sprites/powerup_power.png", Texture.class);
+        assetManager.load("sprites/powerup_range.png", Texture.class);
+        assetManager.load("sprites/powerup_amount.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -104,7 +113,13 @@ public class SinglePlayerScreen implements Screen {
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
-        powerupTexture = assetManager.get("sprites/powerup.png", Texture.class);
+
+        speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
+        powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
+        rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
+        amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
+
+
 
         // Create engine
         this.engine = createEngine();
@@ -156,7 +171,7 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupSystem(powerupTexture));
+        eng.addSystem(new PowerupSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
 
         return eng;
     }

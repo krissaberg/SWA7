@@ -39,7 +39,13 @@ public class Constants {
 
 
     public enum EffectTypes {SPREAD, VANISH};
-    public enum PowerupTypes {NOT_ASSIGNED, SPEED, BOMB_AMOUNT, NONE};
+    public enum PowerupTypes {
+        NOT_ASSIGNED,
+        SPEED,
+        BOMB_AMOUNT,
+        RANGE,
+        POWER,
+        NONE};
 
 
     public enum SpreadTypes {FLOW_AROUND_OBSTACLES, FLOW_CARTESIAN, FLOW_IGNORE_OBSTACLES};

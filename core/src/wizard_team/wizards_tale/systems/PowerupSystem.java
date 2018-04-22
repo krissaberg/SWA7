@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 import java.util.Random;
 
@@ -19,8 +20,11 @@ import static wizard_team.wizards_tale.components.constants.Constants.PowerupTyp
 
 
 public class PowerupSystem extends IteratingSystem {
-    private final Texture textures;
-    private final Random ranGen;
+    private final Texture speedTexture_1;
+    private final Texture amountTexture_1;
+    private final Texture powerTexture_1;
+    private final Texture rangeTexture_1;
+    private Texture[] powerupTextures;
 
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
@@ -31,11 +35,14 @@ public class PowerupSystem extends IteratingSystem {
     private ComponentMapper<PowerupComponent> powerupMapper =
             ComponentMapper.getFor(PowerupComponent.class);
 
-    public PowerupSystem(Texture powerupTextures) {
+    public PowerupSystem(Texture speedTexture,Texture amountTexture,Texture rangeTexture,Texture powerTexture) {
         super(Family.all(PowerupComponent.class, TimedEffectComponent.class).get());
-        //TODO: make textures damn
-        this.textures = powerupTextures;
-        this.ranGen = new Random();
+
+        this.speedTexture_1 = speedTexture;
+        this.amountTexture_1 = amountTexture;
+        this.rangeTexture_1 = rangeTexture;
+        this.powerTexture_1 = powerTexture;
+
     }
 
 
@@ -49,20 +56,29 @@ public class PowerupSystem extends IteratingSystem {
         } else if (powerup.powerupType == PowerupTypes.NOT_ASSIGNED) {
                 int l = PowerupTypes.values().length;
                 // randomly select a powerup type and effect
+                Random ranGen = new Random();
                 int r = ranGen.nextInt(l);
                 PowerupTypes powerupType = PowerupTypes.values()[r];
                 powerup.powerupType = powerupType;
         } else if (timedEffect.time > 0) {
             PowerupTypes powerupType;
-            e.add(new SpriteComponent(textures));
-            //TODO: switch texturerregion
+
             switch (powerup.powerupType) {
                 case NONE:
                     break;
                 case SPEED:
+                    e.add(new SpriteComponent(speedTexture_1));
                     break;
                 case BOMB_AMOUNT:
+                    e.add(new SpriteComponent(amountTexture_1));
                     break;
+                case RANGE:
+                    e.add(new SpriteComponent(rangeTexture_1));
+                    break;
+                case POWER:
+                    e.add(new SpriteComponent(powerTexture_1));
+                    break;
+
             }
         }
 
