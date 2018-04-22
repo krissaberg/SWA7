@@ -4,7 +4,6 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -28,21 +27,16 @@ import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.BoundRectComponent;
-import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
-import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 
-import com.badlogic.gdx.math.MathUtils;
-
-import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
-import wizard_team.wizards_tale.systems.BombSystem;
+import wizard_team.wizards_tale.systems.PowerupRenderSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
 import wizard_team.wizards_tale.systems.TimedRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
@@ -171,7 +165,9 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupRenderSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupSystem());
+
 
         return eng;
     }

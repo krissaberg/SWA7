@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
+import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.DamagerComponent;
 
@@ -36,7 +37,7 @@ public class TimedRenderSystem extends IteratingSystem {
     private SpriteBatch batch;
 
     public TimedRenderSystem(SpriteBatch batch) {
-        super(Family.all(CellPositionComponent.class, TimedEffectComponent.class, SpriteComponent.class).get());
+        super(Family.all(CellPositionComponent.class, TimedEffectComponent.class, SpriteComponent.class).exclude(BombLayerComponent.class).get());
         this.batch = batch;
     }
 

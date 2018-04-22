@@ -36,6 +36,7 @@ public class Constants {
     public static final int DEFAULT_BLOCK_HP = 1;
     public static final int DEFAULT_PLAYER_HP = 1;
     public static final int DEFAULT_MAX_BOMBS = 3;
+    public static int POWERUP_KEEP_TIME = 50;
 
 
     public enum EffectTypes {SPREAD, VANISH};
