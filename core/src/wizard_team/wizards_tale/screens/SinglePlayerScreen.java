@@ -4,6 +4,8 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -26,6 +28,9 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BombLayerComponent;
+import wizard_team.wizards_tale.components.CounterComponent;
+import wizard_team.wizards_tale.components.GameTimeComponent;
+
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
@@ -40,6 +45,8 @@ import com.badlogic.gdx.math.MathUtils;
 
 import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.systems.CountDownSystem;
+import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
 import wizard_team.wizards_tale.systems.BombSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
@@ -65,6 +72,7 @@ public class SinglePlayerScreen implements Screen {
     private Engine engine;
     private Touchpad touchpad;
     private Button bombButton;
+    private float gameTimeLeft;
 
     private Texture whiteMageTex;
     private Texture blackMageTex;
@@ -75,6 +83,7 @@ public class SinglePlayerScreen implements Screen {
     private Texture powerupTexture;
 
     private InputSystem inputSystem;
+    private Label gameTime;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -110,6 +119,11 @@ public class SinglePlayerScreen implements Screen {
         this.engine = createEngine();
     }
 
+    public void setGameTimeLeft(float gameTimeLeft) {
+        this.gameTimeLeft = gameTimeLeft;
+        gameTime.setText("" + Math.round(gameTimeLeft));
+    }
+
     private Engine createEngine() {
         Engine eng = new Engine();
 
@@ -139,7 +153,16 @@ public class SinglePlayerScreen implements Screen {
         // MAP_X and MAP_Y define the Map-grid
         createMap(eng);
 
+        // Clock for Game Cycle entity
+        Entity clock = new Entity();
+        clock.add(new CounterComponent(100));
+        clock.add(new GameTimeComponent());
+        eng.addEntity(clock);
+
         // Systems
+        eng.addSystem(new CountDownSystem());
+        eng.addSystem(new GameCycleSystem(game, this));
+
         eng.addSystem(new RandomWalkerSystem());
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
@@ -164,10 +187,19 @@ public class SinglePlayerScreen implements Screen {
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
 
+        Table topTable = new Table();
+        stage.addActor(topTable);
+        topTable.setFillParent(true);
+        topTable.center().top();
+        //Show gametime
+        gameTime = new Label(gameTimeLeft + "", skin);
+        gameTime.setFontScale(3);
+        topTable.add(gameTime);
+
         Table rootTable = new Table();
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
-        rootTable.setDebug(true);
+        //rootTable.setDebug(true);
         rootTable.left().bottom();
 
         Touchpad touchpad = new Touchpad(15, skin);
