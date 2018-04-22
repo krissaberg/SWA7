@@ -128,7 +128,8 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
         playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
-        //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        //TODO: put back in, handle death
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
         eng.addEntity(playerCharacter);
 
