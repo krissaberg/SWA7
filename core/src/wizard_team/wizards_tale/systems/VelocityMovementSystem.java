@@ -3,13 +3,16 @@ package wizard_team.wizards_tale.systems;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.systems.IteratingSystem;
 
+import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
+import wizard_team.wizards_tale.components.PowerupComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 import com.badlogic.ashley.core.Component;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
+import wizard_team.wizards_tale.components.TimedEffectComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.components.constants.Constants;
 
@@ -31,6 +34,7 @@ public class VelocityMovementSystem extends IteratingSystem {
   private ComponentMapper<CollideableComponent> collisionMapper =
           ComponentMapper.getFor(CollideableComponent.class);
 
+
   public VelocityMovementSystem() {
     super(Family.all(PositionComponent.class, VelocityComponent.class).get());
   }
@@ -47,6 +51,7 @@ public class VelocityMovementSystem extends IteratingSystem {
   }
 
   public void processEntity(Entity e, float dt) {
+
     PositionComponent pos = posMapper.get(e);
     VelocityComponent vel = velMapper.get(e);
 

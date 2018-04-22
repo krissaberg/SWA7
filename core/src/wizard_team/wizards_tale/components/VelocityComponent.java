@@ -11,8 +11,4 @@ public class VelocityComponent implements Component {
     this.v_y = 0;
   }
 
-  public VelocityComponent(float v_x, float v_y) {
-    this.v_x = v_x;
-    this.v_y = v_y;
-  }
 };

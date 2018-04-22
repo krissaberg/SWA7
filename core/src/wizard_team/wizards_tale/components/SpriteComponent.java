@@ -13,5 +13,6 @@ public class SpriteComponent implements Component {
     this.sprite = new Sprite(tex);
     this.width = this.sprite.getWidth();
     this.height = this.sprite.getHeight();
+    
   }
 };

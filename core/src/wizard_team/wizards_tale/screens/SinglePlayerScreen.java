@@ -33,9 +33,7 @@ import wizard_team.wizards_tale.components.CounterComponent;
 import wizard_team.wizards_tale.components.GameTimeComponent;
 
 import wizard_team.wizards_tale.components.BoundRectComponent;
-import wizard_team.wizards_tale.components.CellBoundaryComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
-import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
@@ -43,14 +41,11 @@ import wizard_team.wizards_tale.components.ScoreComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 
-import com.badlogic.gdx.math.MathUtils;
-
-import wizard_team.wizards_tale.components.RandomMovementComponent;
 import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.systems.CountDownSystem;
 import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
-import wizard_team.wizards_tale.systems.BombSystem;
+import wizard_team.wizards_tale.systems.PowerupRenderSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
 import wizard_team.wizards_tale.systems.TimedRenderSystem;
 import wizard_team.wizards_tale.systems.CellPositionSystem;
@@ -84,9 +79,17 @@ public class SinglePlayerScreen implements Screen {
     private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
+
+
+    private Texture speedTexture;
+    private Texture rangeTexture;
+    private Texture powerTexture;
+    private Texture amountTexture;
+
     private Texture powerupTexture;
     private ComponentMapper<DestroyableComponent> destroyableMapper =
             ComponentMapper.getFor(DestroyableComponent.class);
+
 
     private InputSystem inputSystem;
     private Label gameTime;
@@ -110,7 +113,11 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/bomb.png", Texture.class);
         assetManager.load("sprites/explosion.png", Texture.class);
         assetManager.load("sprites/soft_wall.png", Texture.class);
-        assetManager.load("sprites/powerup.png", Texture.class);
+
+        assetManager.load("sprites/powerup_speed.png", Texture.class);
+        assetManager.load("sprites/powerup_power.png", Texture.class);
+        assetManager.load("sprites/powerup_range.png", Texture.class);
+        assetManager.load("sprites/powerup_amount.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -119,7 +126,13 @@ public class SinglePlayerScreen implements Screen {
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
-        powerupTexture = assetManager.get("sprites/powerup.png", Texture.class);
+
+        speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
+        powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
+        rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
+        amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
+
+
 
         // Create engine
         this.engine = createEngine();
@@ -187,7 +200,9 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupSystem(powerupTexture));
+        eng.addSystem(new PowerupRenderSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupSystem());
+
 
         return eng;
     }

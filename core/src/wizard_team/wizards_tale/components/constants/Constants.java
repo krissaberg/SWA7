@@ -36,10 +36,17 @@ public class Constants {
     public static final int DEFAULT_BLOCK_HP = 1;
     public static final int DEFAULT_PLAYER_HP = 10;
     public static final int DEFAULT_MAX_BOMBS = 3;
+    public static int POWERUP_KEEP_TIME = 50;
 
 
     public enum EffectTypes {SPREAD, VANISH};
-    public enum PowerupTypes {NOT_ASSIGNED, SPEED, BOMB_AMOUNT, NONE};
+    public enum PowerupTypes {
+        NOT_ASSIGNED,
+        SPEED,
+        BOMB_AMOUNT,
+        RANGE,
+        POWER,
+        NONE};
 
 
     public enum SpreadTypes {FLOW_AROUND_OBSTACLES, FLOW_CARTESIAN, FLOW_IGNORE_OBSTACLES};
