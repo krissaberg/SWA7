@@ -12,14 +12,17 @@ public class BombLayerComponent implements Component {
     public int depth;
     public int damage;
     public int maxBombs;
-    public int bombsLaid;
     public boolean laidBomb;
+    public int rangeBuff;
+    public int damageBuff;
 
-    public BombLayerComponent(int spread, int depth, int damage, int maxBombs) {
+    public BombLayerComponent(int spread, int depth, int damage) {
         this.spread = spread;
         this.depth = depth;
         this.damage = damage;
-        this.maxBombs = maxBombs;
+        this.maxBombs = 3;
         this.laidBomb = false;
+        this.rangeBuff = 1;
+        this.damageBuff = 1;
     }
 }

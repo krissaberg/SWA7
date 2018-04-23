@@ -24,12 +24,9 @@ import wizard_team.wizards_tale.components.constants.Constants;
 public class BombSystem extends IteratingSystem {
     private Texture bombTexture;
 
-    private ComponentMapper<CellPositionComponent> cellPosMapper =
-            ComponentMapper.getFor(CellPositionComponent.class);
     private ComponentMapper<TimedEffectComponent> timeEffectMapper =
             ComponentMapper.getFor(TimedEffectComponent.class);
-    private ComponentMapper<SpreadableComponent> spreadMapper =
-            ComponentMapper.getFor(SpreadableComponent.class);
+
 
 
     public BombSystem(Texture bombTexture) {

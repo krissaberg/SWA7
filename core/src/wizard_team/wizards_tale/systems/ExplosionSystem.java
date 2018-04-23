@@ -22,9 +22,12 @@ import wizard_team.wizards_tale.screens.SinglePlayerScreen;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.graphics.Texture;
 
+import java.util.Random;
+
 public class ExplosionSystem extends IteratingSystem {
     private final Texture explosionTexture;
     private final Texture bombTexture;
+    private Random ranGen;
     private SinglePlayerScreen screen;
     private ComponentMapper<CellPositionComponent> cellPosMapper =
             ComponentMapper.getFor(CellPositionComponent.class);
@@ -47,42 +50,71 @@ public class ExplosionSystem extends IteratingSystem {
     private ComponentMapper<CollideableComponent> collideableMapper =
             ComponentMapper.getFor(CollideableComponent.class);
 
-    public ExplosionSystem(Texture bombTexture, Texture explosionTexture, SinglePlayerScreen screen) {
+    private ComponentMapper<BombLayerComponent> bombLayerMapper =
+            ComponentMapper.getFor(BombLayerComponent.class);
+
+    public ExplosionSystem(Texture bombTexture, Texture explosionTexture) {
         super(Family.all(DamagerComponent.class, TimedEffectComponent.class).get());
         this.bombTexture = bombTexture;
         this.explosionTexture = explosionTexture;
+        this.ranGen = new Random();
         this.screen = screen;
     }
 
-    // Handles spreading of an explosion in a certain direction. I.e. left would be dx=-1, dy=0
-    public void spread(int depth, int x, int y, int dx, int dy) {
+    public boolean canFlowOver(Entity collideable, int depth) {
+        CellPositionComponent collideablePos = cellPosMapper.get(collideable);
+        if (collideableMapper.get(collideable).height > depth) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isDestroyable(Entity collideable, int damage) {
+        if (destroyableMapper.get(collideable).hp > damage) {
+            return false;
+        }
+        return true;
+    }
+
+    public Entity getOncomingCollideable(int start_x, int start_y, int dx, int dy) {
         Family collideableFam = Family.all(CollideableComponent.class).exclude(BombLayerComponent.class).get();
         ImmutableArray<Entity> collideables = getEngine().getEntitiesFor(collideableFam);
 
-        // Moving in a certain direction, we check if there is a collision
-        for (int i = 1; i < depth; i++) {
-            for (Entity collideable : collideables){
-                CellPositionComponent collideablePos = cellPosMapper.get(collideable);
+        for (Entity collideable : collideables) {
+            CellPositionComponent collideablePos = cellPosMapper.get(collideable);
+            int collideable_x = collideablePos.x;
+            int collideable_y = collideablePos.y;
+            int height = collideableMapper.get(collideable).height;
+            // If the collidable is taller, we should stop
+            if (collideable_x == start_x + dx & collideable_y == start_y + dy) {
+                return collideable;
+            }
+        }
+        System.out.println("should never happen: didnt find collideable");
+        return new Entity();
 
-                int collideable_x = collideablePos.x;
-                int collideable_y = collideablePos.y;
-                int height = collideableMapper.get(collideable).height;
+    }
 
-                // Check if player
+    // Handles spreading of an explosion in a certain direction. I.e. left would be dx=-1, dy=0
+    public void spread(int damage, int range, int depth, int start_x, int start_y, int dx, int dy) {
 
-                // If the collidable is taller, we should stop
-                if (collideable_x == x + dx & collideable_y == y + dy) {
-                    if (height > depth) {
-                        break;
-                    } else {
-                        int new_depth = depth - height;
+        for (int i = 0; i < range ; i ++) {
+            int xMove = start_x + dx*i;
+            int yMove = start_y + dy*i;
+            if ((0 <= xMove & xMove < Constants.MAP_X) & (0<=yMove & yMove < Constants.MAP_Y)) {
+                Entity collideable = getOncomingCollideable(start_x, start_y, dx*i, dy*i);
+                if (canFlowOver(collideable, depth)) {
+                    if (isDestroyable(collideable, damage)) {
+                        range -= 1;
                         collideable.remove(CollideableComponent.class);
                         collideable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
-                        collideable.add(new SpreadableComponent(new_depth));
+                        collideable.add(new SpreadableComponent(depth));
                         collideable.add(new DamagerComponent(Constants.DEFAULT_BOMB_DAMAGE));
                         collideable.add(new SpriteComponent(explosionTexture));
                         collideable.add(new TimedEffectComponent(Constants.DEFAULT_EXPLOSION_TIME, Constants.EffectTypes.VANISH));
                     }
+                } else {
+                    break; // can't flow over, stop
                 }
                 // Check if player is hit
 
@@ -97,8 +129,22 @@ public class ExplosionSystem extends IteratingSystem {
         DamagerComponent damager = damageMapper.get(e);
         SpreadableComponent spreadable = spreadMapper.get(e);
 
-        int damage = damager.damage;
+        Family playerFamily = Family.all(BombLayerComponent.class).get();
+        ImmutableArray<Entity> players = getEngine().getEntitiesFor(playerFamily);
+
+        int damageBuff=1;
+        int rangeBuff=1;
+
+        for (Entity player : players) {
+            BombLayerComponent p = bombLayerMapper.get(player);
+            damageBuff = p.damageBuff;
+            rangeBuff = p.rangeBuff;
+        }
+
+        int damage = damager.damage * damageBuff;
         int depth = spreadable.depth;
+        int range = Constants.DEFAULT_BOMB_RANGE + rangeBuff;
+
         int x = cellPos.x;
         int y = cellPos.y;
 
@@ -106,11 +152,11 @@ public class ExplosionSystem extends IteratingSystem {
         if (timedEffect.effect == Constants.EffectTypes.SPREAD) {
             // Check if it is bomb detonation time
             if (timedEffect.time == 0) {
-                spread(2, x, y,0,0); // In origin
-                spread(depth, x, y,1,0); // Right
-                spread(depth, x, y,-1,0); // Left
-                spread(depth, x, y,0,1); // Up
-                spread(depth, x, y,0,-1); // Down
+                spread(damage, range, depth, x, y,1,0); // Right
+                spread(damage, range, depth, x, y,-1,0); // Left
+                spread(damage, range, depth, x, y,0,1); // Up
+                spread(damage, range, depth, x, y,0,-1); // Down
+
             } else {
                 // If not detonation, render as bomb, time down handled by TimedRenderSystem
                 e.add(new SpriteComponent(this.bombTexture));
@@ -143,13 +189,13 @@ public class ExplosionSystem extends IteratingSystem {
                             if (destroyableComponent.hp == 10) {
                                 ScoreComponent score = scoreMapper.get(destroyable);
                                 destroyableComponent.hp = 0;
+                                destroyableComponent.isAlive = false;
                                 score.deaths++;
                                 //Update screen
-                                screen.isAlive = false;
                                 //Remove player sprite and create regular tile
                                 destroyable.remove(SpriteComponent.class);
                                 destroyable.remove(CollideableComponent.class);
-                                destroyable.add(new DestroyableComponent(0));
+                                destroyable.add(new DestroyableComponent(0, false));
                                 destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
                             }
                             destroyableComponent.hp -= damage;
@@ -157,16 +203,22 @@ public class ExplosionSystem extends IteratingSystem {
                                 destroyable.remove(SpriteComponent.class);
                                 destroyable.remove(CollideableComponent.class);
                                 //Make a regular tile hp
-                                destroyable.add(new DestroyableComponent(0));
+                                destroyable.add(new DestroyableComponent(0, false));
                                 destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
-                                destroyable.add(new PowerupComponent(Constants.PowerupTypes.NOT_ASSIGNED, 0));
-                                destroyable.add(new TimedEffectComponent(Constants.POWERUP_TIME, Constants.EffectTypes.VANISH));
+                                int l = Constants.PowerupTypes.values().length;
+                                // randomly select a powerup type and effect
+                                int r = ranGen.nextInt(l); //TODO: change
+                                System.out.println("random int: " + r);
+                                if (r < l) {
+                                    Constants.PowerupTypes randPower = Constants.PowerupTypes.values()[r];
+                                    destroyable.add(new PowerupComponent(randPower, 2));
+                                    destroyable.add(new TimedEffectComponent(Constants.POWERUP_TIME, Constants.EffectTypes.VANISH));
+                                }
                             }
                         }
                     }
                 }
             }
         }
-
     }
 }

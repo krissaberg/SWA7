@@ -35,6 +35,9 @@ public class PowerupSystem extends IteratingSystem {
     private ComponentMapper<VelocityComponent> velMapper =
             ComponentMapper.getFor(VelocityComponent.class);
 
+    private ComponentMapper<BombLayerComponent> bombLayerMapper =
+            ComponentMapper.getFor(BombLayerComponent.class);
+
 
     public PowerupSystem() {
         super(Family.all(BombLayerComponent.class, TimedEffectComponent.class, PowerupComponent.class).get());
@@ -45,35 +48,37 @@ public class PowerupSystem extends IteratingSystem {
         Entity player = e;
             PowerupComponent power = powerupMapper.get(player);
             TimedEffectComponent timed = timedMapper.get(player);
-            int delta = 1;
+        if (timed.time == 0) {
+            player.remove(TimedEffectComponent.class);
+            player.remove(PowerupComponent.class);
+        }
 
-            switch (power.powerupType) {
-                case NONE:
-                    break;
-                case SPEED:
-                    if (timed.time > 0) {delta = power.amount;}
-                    // TODO:
-                    break;
-                case BOMB_AMOUNT:
-                    if (timed.time > 0) {delta = power.amount;}
-                    // TODO:
+        switch (power.powerupType) {
+            case SPEED:
+                if (timed.time > 0) {
+                    VelocityComponent vel = velMapper.get(e);
+                    if (vel.buff == Constants.DEFAULT_SPEED) {
+                        vel.buff = power.amount;
+                    } else {
+                        vel.buff = Constants.DEFAULT_SPEED;
+                    }
+                }
+                break;
+            case RANGE:
+                if (timed.time > 0) {
+                    BombLayerComponent lay = bombLayerMapper.get(e);
+                    if (lay.rangeBuff == Constants.DEFAULT_BOMB_RANGE) {
+                        lay.rangeBuff = power.amount;
+                    } else {
+                        lay.rangeBuff = Constants.DEFAULT_BOMB_RANGE;
+                    }
+                }
+                break;
+        }
 
-                    break;
-                case RANGE:
-                    if (timed.time > 0) {delta = power.amount;}
-                    // TODO:
 
-                    break;
-                case POWER:
-                    if (timed.time > 0) {delta = power.amount;}
-                    // TODO:
-                    break;
-            }
 
-            if (timed.time == 0) {
-                player.remove(TimedEffectComponent.class);
-                player.remove(PowerupComponent.class);
-            }
+
 
     }
 }

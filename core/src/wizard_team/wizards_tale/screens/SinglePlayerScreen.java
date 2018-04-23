@@ -62,7 +62,6 @@ import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
-    public boolean isAlive = true;
 
     private WizardsTaleGame game;
     private Skin skin;
@@ -89,8 +88,6 @@ public class SinglePlayerScreen implements Screen {
 
     private Texture speedTexture;
     private Texture rangeTexture;
-    private Texture powerTexture;
-    private Texture amountTexture;
 
     private Texture powerupTexture;
     private ComponentMapper<DestroyableComponent> destroyableMapper =
@@ -133,11 +130,8 @@ public class SinglePlayerScreen implements Screen {
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
         speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
-        powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
         rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
-        amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
         playbackground = assetManager.get("playbackground.png", Texture.class);
-
 
 
         // Create engine
@@ -166,10 +160,11 @@ public class SinglePlayerScreen implements Screen {
         Rectangle playerBound = new Rectangle(0, 0, blackMageTex.getWidth(), blackMageTex.getHeight());
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
-        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
-        //TODO: put back in, handle death
-        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
+
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
         playerCharacter.add(new ScoreComponent(0, 0));
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
         eng.addEntity(playerCharacter);
 
@@ -206,7 +201,7 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupRenderSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupRenderSystem(speedTexture, rangeTexture));
         eng.addSystem(new PowerupSystem());
 
 
@@ -271,7 +266,8 @@ public class SinglePlayerScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //TODO Update server if player with your username is dead.
         //^ The HP of player entity == 0 when dead.
-        if (!isAlive) {
+        DestroyableComponent dest = engine.getEntities().get(0).getComponent(DestroyableComponent.class);
+        if (!dest.isAlive) {
             game.setScreen(new FinishedScreen(game, "GAME OVER!", 4));
             //TODO Find remaining players in multiplayerScreen and pass it to "place"
         }
@@ -294,7 +290,7 @@ public class SinglePlayerScreen implements Screen {
             for (int y = 0; y < Constants.MAP_Y; y++) {
                 Entity tile = new Entity();
                 tile.add(new CellPositionComponent(x,y));
-                tile.add(new DestroyableComponent(0));
+                tile.add(new DestroyableComponent(0, false));
 
                 //TODO: Don't place something on top left L or bottom right L (players start)
                 if (0<=x && x<=1 & Constants.MAP_Y-2 <= y && y<= Constants.MAP_Y-1|| x==Constants.MAP_X & y==0) {
@@ -315,7 +311,7 @@ public class SinglePlayerScreen implements Screen {
                     } else {
                         // Place soft blocks
                         tile.add(new SpriteComponent(softWallTexture));
-                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP, false));
                         tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
                     }
                 }

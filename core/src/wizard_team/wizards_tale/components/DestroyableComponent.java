@@ -8,8 +8,10 @@ import com.badlogic.ashley.core.Component;
 
 public class DestroyableComponent implements Component {
     public int hp;
+    public boolean isAlive;
 
-    public DestroyableComponent(int hp) {
+    public DestroyableComponent(int hp, boolean isAlive) {
         this.hp = hp;
+        this.isAlive = isAlive;
     }
 }
