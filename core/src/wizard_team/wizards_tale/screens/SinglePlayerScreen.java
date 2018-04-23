@@ -249,7 +249,7 @@ public class SinglePlayerScreen implements Screen, Observer {
         rootTable.left().bottom();
         stage.addActor(rootTable);
 
-        rootTable.setDebug(true);
+//        rootTable.setDebug(true);
 
         rootTable.add(topTable).expandX();
         rootTable.row().expandX();
