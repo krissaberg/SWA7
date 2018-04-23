@@ -1,4 +1,4 @@
-package wizard_team.wizards_tale;
+package wizard_team.wizards_tale.desktop;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
