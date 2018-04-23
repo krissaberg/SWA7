@@ -31,7 +31,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
+import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
+import com.shephertz.app42.gaming.multiplayer.client.listener.NotifyListener;
 
+import org.javatuples.Pair;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
+import wizard_team.wizards_tale.appwarp_listeners.ConnReqEvent;
+import wizard_team.wizards_tale.appwarp_listeners.NotifyEvent;
 import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CounterComponent;
 import wizard_team.wizards_tale.components.GameTimeComponent;
@@ -49,6 +65,7 @@ import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.systems.CountDownSystem;
 import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
+import wizard_team.wizards_tale.systems.NetworkSystem;
 import wizard_team.wizards_tale.systems.PowerupRenderSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
 import wizard_team.wizards_tale.systems.TimedRenderSystem;
@@ -61,8 +78,10 @@ import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
-public class SinglePlayerScreen implements Screen {
+public class SinglePlayerScreen implements Screen, Observer {
 
+    private final int timeLimit;
+    private boolean powerupsEnabled = true;
     private WizardsTaleGame game;
     private Skin skin;
     private Stage stage;
@@ -95,9 +114,12 @@ public class SinglePlayerScreen implements Screen {
 
 
     private InputSystem inputSystem;
+    private String tag = "SinglePlayerScreen";
+    private NetworkSystem networkSystem;
+    private TextButton scoreList;
 
     public SinglePlayerScreen(
-            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
+            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager, int time, boolean powerupsEnabled) {
         this.assetManager = assetManager;
         this.game = game;
         this.skin = skin;
@@ -106,7 +128,13 @@ public class SinglePlayerScreen implements Screen {
         this.viewport = new FitViewport(800, 600, this.camera);
         viewport.apply(true);
         this.stage = createStage(viewport);
+        this.timeLimit = time;
+        this.powerupsEnabled = powerupsEnabled;
         Gdx.input.setInputProcessor(this.stage);
+
+        // Subscribe to observables
+        game.listeners.notifyListener.addObserver(this);
+        game.listeners.chatRequestListener.addObserver(this);
 
         // Load assets
         assetManager.load("sprites/black_mage.png", Texture.class);
@@ -164,7 +192,7 @@ public class SinglePlayerScreen implements Screen {
 
         playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
         playerCharacter.add(new ScoreComponent(0, 0));
-        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
 
         eng.addEntity(playerCharacter);
 
@@ -177,11 +205,13 @@ public class SinglePlayerScreen implements Screen {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(10));
+        clock.add(new CounterComponent(timeLimit));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
         // Systems
+        this.networkSystem = new NetworkSystem(game);
+        eng.addSystem(networkSystem);
         eng.addSystem(new CountDownSystem());
         eng.addSystem(new GameCycleSystem(game, this));
 
@@ -202,7 +232,9 @@ public class SinglePlayerScreen implements Screen {
 
         // PU
         eng.addSystem(new PowerupRenderSystem(speedTexture, rangeTexture));
-        eng.addSystem(new PowerupSystem());
+        if(powerupsEnabled) {
+            eng.addSystem(new PowerupSystem());
+        }
 
 
         return eng;
@@ -210,37 +242,49 @@ public class SinglePlayerScreen implements Screen {
 
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
+
+        Table rootTable = new Table();
         Table topTable = new Table();
-        stage.addActor(topTable);
-        topTable.setFillParent(true);
-        topTable.center().top();
+        Table scoreTable = new Table();
+        Table bottomRow = new Table();
+        rootTable.setFillParent(true);
+        stage.addActor(rootTable);
+
+//        rootTable.setDebug(true);
+
+        rootTable.add(topTable).width(800).height(200).expandY().top().right();
+        rootTable.row();
+        rootTable.add(new Table()).height(200);
+        rootTable.row();
+        rootTable.add(bottomRow).width(800).height(200);
 
         //Show gametime
         clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
         clockbutton.setBounds(0,0, 400, 400);
         clockbutton.setTouchable(Touchable.disabled);
-        topTable.add(clockbutton).width(200).height(50);
+        topTable.add(new Table()).expandX();
+        topTable.add(clockbutton).top().width(200).height(50).top().center();
 
-        Table rootTable = new Table();
-        stage.addActor(rootTable);
-        rootTable.setFillParent(true);
-        //rootTable.setDebug(true);
-        rootTable.left().bottom();
+        // Show other players' scores
+        scoreList = new TextButton("", skin);
+        scoreList.setTouchable(Touchable.disabled);
+        topTable.add(scoreList).top().right();
 
         Touchpad touchpad = new Touchpad(15, skin);
-        rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
-        rootTable.add(new Table()).expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
         this.bombButton = bombButton;
-        rootTable.add(bombButton).bottom().right();
         this.bombButton.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 inputSystem.setBombButtonPressed();
             }
         });
+
+        bottomRow.add(touchpad).left();
+        bottomRow.add(new Table()).expandX();
+        bottomRow.add(bombButton).right();
 
         return stage;
     }
@@ -273,6 +317,19 @@ public class SinglePlayerScreen implements Screen {
         }
 
         engine.update(dt);
+
+        StringBuilder s = new StringBuilder();
+        HashMap<String, Integer> scores = networkSystem.scores;
+        scores = networkSystem.scores;
+        LinkedList<Map.Entry<String, Integer>> scoreList2 = new LinkedList(scores.entrySet());
+        for (Map.Entry<String, Integer> stringIntegerEntry : scoreList2) {
+            String key = stringIntegerEntry.getKey();
+            int value = stringIntegerEntry.getValue();
+            s.append(String.format("%s: %d\n", key, value));
+        }
+
+        scoreList.setText(s.toString());
+
         stage.act(dt);
         stage.draw();
         //spriteBatch.begin();
@@ -318,5 +375,38 @@ public class SinglePlayerScreen implements Screen {
                 eng.addEntity(tile);
             }
         }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+
+        Gdx.app.log(tag, observable.toString() + " " + o.toString());
+
+        if(observable instanceof NotifyListener) {
+            Pair notification = (Pair) o;
+            NotifyEvent type = (NotifyEvent) notification.getValue0();
+            Object payload = notification.getValue1();
+
+            switch (type) {
+
+                case CHAT_RECEIVED:
+                    networkSystem.sendMessage((ChatEvent) payload);
+                    break;
+            }
+
+        }
+
+        if(observable instanceof ConnectionRequestListener) {
+            Pair message = (Pair) o;
+            ConnReqEvent type = (ConnReqEvent) message.getValue0();
+            switch (type) {
+
+                case DISCONNECT_DONE:
+                    break;
+                case CONNECT_DONE:
+                    break;
+            }
+        }
+
     }
 }

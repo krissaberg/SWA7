@@ -51,7 +51,7 @@ public class PowerupRenderSystem extends IteratingSystem {
             switch (curPowerup.powerupType) {
                 case SPEED:
                     e.add(new SpriteComponent(speedTexture_1));
-                    System.out.println("got speed doe"); //TODO:remove
+//                    System.out.println("got speed doe"); //TODO:remove
                 case RANGE:
                     e.add(new SpriteComponent(rangeTexture_1));
                     break;

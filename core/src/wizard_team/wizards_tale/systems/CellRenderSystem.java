@@ -36,8 +36,8 @@ public class CellRenderSystem extends IteratingSystem {
         BitmapFont font = new BitmapFont(); //or use alex answer to use custom font
 
         batch.begin();
-        font.draw(batch, "cell x: " + cellPos.x + " cell y: " + cellPos.y +
-                "\npos x: " + pos.x + "pos y:" + pos.y, 10, 50);
+//        font.draw(batch, "cell x: " + cellPos.x + " cell y: " + cellPos.y +
+//                "\npos x: " + pos.x + "pos y:" + pos.y, 10, 50);
         batch.end();
     }
 }

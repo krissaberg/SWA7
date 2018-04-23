@@ -20,13 +20,14 @@ public class Constants {
     public static final int HARD_BLOCK_HEIGHT = 10;
     public static final int SOFT_BLOCK_HEIGHT = 1;
     public static final int DEFAULT_BLOCK_HP = 1;
+    public static final int DEFAULT_PLAYER_HP = 10;
 
     public static int DEFAULT_SPEED = 1;
 
     // Time constants
     public static int POWERUP_KEEP_TIME = 25;
     public static final int POWERUP_TIME = 50; //how long the powerup is in play, should be less than explosion time (hacky)
-    public static final int DEFAULT_DETONATION_TIME = 10;
+    public static final int DEFAULT_DETONATION_TIME = 100;
     public static final int DEFAULT_EXPLOSION_TIME = 5;
 
     // Enums
