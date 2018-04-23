@@ -2,11 +2,15 @@ package wizard_team.wizards_tale.screens;
 
 import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
+
+import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -29,6 +33,9 @@ public class MainMenuScreen implements Screen {
   AssetManager assetManager;
   Viewport viewport;
   Camera camera;
+  private Label timeLabel;
+  private Slider slider;
+  private int time = 30;
 
   public MainMenuScreen(WizardsTaleGame game) {
     this.assetManager = game.getAssetManager();
@@ -51,13 +58,20 @@ public class MainMenuScreen implements Screen {
     stage.addActor(rootTable);
     rootTable.setFillParent(true);
 
+    timeLabel = new Label("", skin);
+    slider = new Slider(20, 60, 1, false, skin);
+    rootTable.add(timeLabel);
+    rootTable.add(slider);
+
+    rootTable.row();
+
     Button startButton = new TextButton("New Game", skin);
     rootTable.add(startButton);
     startButton.addListener(
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
-            game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager));
+            game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager, time));
           }
         });
 
@@ -79,6 +93,9 @@ public class MainMenuScreen implements Screen {
   public void render(float dt) {
     Gdx.gl.glClearColor(0.1f, 0, 0, 1);
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+    time = (int) slider.getValue();
+    timeLabel.setText(String.valueOf(time));
 
     spriteBatch.begin();
     spriteBatch.draw(backgroundTex, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());

@@ -80,6 +80,7 @@ import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen, Observer {
 
+    private final int timeLimit;
     private WizardsTaleGame game;
     private Skin skin;
     private Stage stage;
@@ -117,7 +118,7 @@ public class SinglePlayerScreen implements Screen, Observer {
     private TextButton scoreList;
 
     public SinglePlayerScreen(
-            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
+            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager, int time) {
         this.assetManager = assetManager;
         this.game = game;
         this.skin = skin;
@@ -126,6 +127,7 @@ public class SinglePlayerScreen implements Screen, Observer {
         this.viewport = new FitViewport(800, 600, this.camera);
         viewport.apply(true);
         this.stage = createStage(viewport);
+        this.timeLimit = time;
         Gdx.input.setInputProcessor(this.stage);
 
         // Subscribe to observables
@@ -201,7 +203,7 @@ public class SinglePlayerScreen implements Screen, Observer {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(45));
+        clock.add(new CounterComponent(timeLimit));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
@@ -236,11 +238,18 @@ public class SinglePlayerScreen implements Screen, Observer {
 
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
+        Table rootTable = new Table();
         Table topTable = new Table();
-        stage.addActor(topTable);
-        topTable.setFillParent(true);
-        topTable.top();
-        topTable.setDebug(true);
+        Table bottomRow = new Table();
+        rootTable.setFillParent(true);
+        rootTable.left().bottom();
+        stage.addActor(rootTable);
+
+        rootTable.setDebug(true);
+
+        rootTable.add(topTable).expandX();
+        rootTable.row().expandX();
+        rootTable.add(bottomRow).expandX();
 
         //Show gametime
         clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
@@ -249,29 +258,27 @@ public class SinglePlayerScreen implements Screen, Observer {
         topTable.add(clockbutton).width(200).height(50).top().center();
 
         // Show other players' scores
-        scoreList = new TextButton("Bob: 10\nBobby: 100", skin);
-        topTable.add(scoreList).top().right().expandY();
+        scoreList = new TextButton("", skin);
+        scoreList.setTouchable(Touchable.disabled);
+        topTable.add(scoreList);
 
-        Table rootTable = new Table();
-        stage.addActor(rootTable);
-        rootTable.setFillParent(true);
         //rootTable.setDebug(true);
-        rootTable.left().bottom();
 
         Touchpad touchpad = new Touchpad(15, skin);
-        rootTable.add(touchpad).bottom().left();
         this.touchpad = touchpad;
-        rootTable.add(new Table()).expandX();
 
         Button bombButton = new TextButton("Place\nbomb", skin);
         this.bombButton = bombButton;
-        rootTable.add(bombButton).bottom().right();
         this.bombButton.addListener(new ChangeListener() {
             @Override
             public void changed (ChangeEvent event, Actor actor) {
                 inputSystem.setBombButtonPressed();
             }
         });
+
+        bottomRow.add(touchpad).left();
+        bottomRow.add(new Table()).expandX();
+        bottomRow.add(bombButton).right();
 
         return stage;
     }
