@@ -81,6 +81,7 @@ import wizard_team.wizards_tale.systems.InputSystem;
 public class SinglePlayerScreen implements Screen, Observer {
 
     private final int timeLimit;
+    private boolean powerupsEnabled = true;
     private WizardsTaleGame game;
     private Skin skin;
     private Stage stage;
@@ -118,7 +119,7 @@ public class SinglePlayerScreen implements Screen, Observer {
     private TextButton scoreList;
 
     public SinglePlayerScreen(
-            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager, int time) {
+            WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager, int time, boolean powerupsEnabled) {
         this.assetManager = assetManager;
         this.game = game;
         this.skin = skin;
@@ -128,6 +129,7 @@ public class SinglePlayerScreen implements Screen, Observer {
         viewport.apply(true);
         this.stage = createStage(viewport);
         this.timeLimit = time;
+        this.powerupsEnabled = powerupsEnabled;
         Gdx.input.setInputProcessor(this.stage);
 
         // Subscribe to observables
@@ -230,7 +232,9 @@ public class SinglePlayerScreen implements Screen, Observer {
 
         // PU
         eng.addSystem(new PowerupRenderSystem(speedTexture, rangeTexture));
-        eng.addSystem(new PowerupSystem());
+        if(powerupsEnabled) {
+            eng.addSystem(new PowerupSystem());
+        }
 
 
         return eng;

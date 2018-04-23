@@ -4,6 +4,7 @@ import com.badlogic.gdx.Screen;
 import wizard_team.wizards_tale.WizardsTaleGame;
 
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -36,6 +37,8 @@ public class MainMenuScreen implements Screen {
   private Label timeLabel;
   private Slider slider;
   private int time = 30;
+  private boolean powerupsEnabled = true;
+  private CheckBox powerupBox;
 
   public MainMenuScreen(WizardsTaleGame game) {
     this.assetManager = game.getAssetManager();
@@ -58,6 +61,10 @@ public class MainMenuScreen implements Screen {
     stage.addActor(rootTable);
     rootTable.setFillParent(true);
 
+    powerupBox = new CheckBox("Powerups enabled", skin);
+    rootTable.add(powerupBox);
+    rootTable.row();
+
     timeLabel = new Label("", skin);
     slider = new Slider(20, 60, 1, false, skin);
     rootTable.add(timeLabel);
@@ -71,7 +78,7 @@ public class MainMenuScreen implements Screen {
         new ClickListener() {
           @Override
           public void clicked(InputEvent event, float x, float y) {
-            game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager, time));
+            game.setScreen(new SinglePlayerScreen(game, spriteBatch, skin, assetManager, time, powerupsEnabled));
           }
         });
 
@@ -96,6 +103,8 @@ public class MainMenuScreen implements Screen {
 
     time = (int) slider.getValue();
     timeLabel.setText(String.valueOf(time));
+
+    powerupsEnabled = powerupBox.isChecked();
 
     spriteBatch.begin();
     spriteBatch.draw(backgroundTex, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
