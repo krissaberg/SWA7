@@ -143,13 +143,13 @@ public class ExplosionSystem extends IteratingSystem {
                             if (destroyableComponent.hp == 10) {
                                 ScoreComponent score = scoreMapper.get(destroyable);
                                 destroyableComponent.hp = 0;
+                                destroyableComponent.isAlive = false;
                                 score.deaths++;
                                 //Update screen
-                                screen.isAlive = false;
                                 //Remove player sprite and create regular tile
                                 destroyable.remove(SpriteComponent.class);
                                 destroyable.remove(CollideableComponent.class);
-                                destroyable.add(new DestroyableComponent(0));
+                                destroyable.add(new DestroyableComponent(0, false));
                                 destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
                             }
                             destroyableComponent.hp -= damage;
@@ -157,7 +157,7 @@ public class ExplosionSystem extends IteratingSystem {
                                 destroyable.remove(SpriteComponent.class);
                                 destroyable.remove(CollideableComponent.class);
                                 //Make a regular tile hp
-                                destroyable.add(new DestroyableComponent(0));
+                                destroyable.add(new DestroyableComponent(0, false));
                                 destroyable.add(new CollideableComponent(0, Constants.CollideableType.NONE));
                                 destroyable.add(new PowerupComponent(Constants.PowerupTypes.NOT_ASSIGNED, 0));
                                 destroyable.add(new TimedEffectComponent(Constants.POWERUP_TIME, Constants.EffectTypes.VANISH));
