@@ -47,7 +47,7 @@ public class RenderSystem extends IteratingSystem {
     batch.begin();
     batch.draw(sprite.getTexture(), pos.x, pos.y);
     batch.end();
-    if(boundMapper.has(e)) {
+    if(false && boundMapper.has(e)) {
       BoundRectComponent bounds = boundMapper.get(e);
       Rectangle rect = bounds.boundRect;
       shapeRenderer.setProjectionMatrix(batch.getProjectionMatrix());

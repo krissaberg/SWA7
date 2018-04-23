@@ -242,31 +242,33 @@ public class SinglePlayerScreen implements Screen, Observer {
 
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
+
         Table rootTable = new Table();
         Table topTable = new Table();
+        Table scoreTable = new Table();
         Table bottomRow = new Table();
         rootTable.setFillParent(true);
-        rootTable.left().bottom();
         stage.addActor(rootTable);
 
 //        rootTable.setDebug(true);
 
-        rootTable.add(topTable).expandX();
-        rootTable.row().expandX();
-        rootTable.add(bottomRow).expandX();
+        rootTable.add(topTable).width(800).height(200).expandY().top().right();
+        rootTable.row();
+        rootTable.add(new Table()).height(200);
+        rootTable.row();
+        rootTable.add(bottomRow).width(800).height(200);
 
         //Show gametime
         clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
         clockbutton.setBounds(0,0, 400, 400);
         clockbutton.setTouchable(Touchable.disabled);
-        topTable.add(clockbutton).width(200).height(50).top().center();
+        topTable.add(new Table()).expandX();
+        topTable.add(clockbutton).top().width(200).height(50).top().center();
 
         // Show other players' scores
         scoreList = new TextButton("", skin);
         scoreList.setTouchable(Touchable.disabled);
-        topTable.add(scoreList);
-
-        //rootTable.setDebug(true);
+        topTable.add(scoreList).top().right();
 
         Touchpad touchpad = new Touchpad(15, skin);
         this.touchpad = touchpad;
