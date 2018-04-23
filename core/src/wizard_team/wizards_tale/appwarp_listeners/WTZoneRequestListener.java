@@ -9,54 +9,66 @@ import com.shephertz.app42.gaming.multiplayer.client.listener.ZoneRequestListene
 
 import java.util.Observable;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class WTZoneRequestListener extends Observable implements ZoneRequestListener {
     @Override
     public void onDeleteRoomDone(RoomEvent roomEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetAllRoomsDone(AllRoomsEvent allRoomsEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onCreateRoomDone(RoomEvent roomEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetOnlineUsersDone(AllUsersEvent allUsersEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetLiveUserInfoDone(LiveUserInfoEvent liveUserInfoEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onSetCustomUserDataDone(LiveUserInfoEvent liveUserInfoEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetMatchedRoomsDone(MatchedRoomsEvent matchedRoomsEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetAllRoomsCountDone(AllRoomsEvent allRoomsEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetOnlineUsersCountDone(AllUsersEvent allUsersEvent) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onGetUserStatusDone(LiveUserInfoEvent liveUserInfoEvent) {
 
+        throw new NotImplementedException();
     }
 }

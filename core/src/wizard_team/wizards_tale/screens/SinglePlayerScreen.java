@@ -31,7 +31,23 @@ import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.Touchpad;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.shephertz.app42.gaming.multiplayer.client.events.ChatEvent;
+import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestListener;
+import com.shephertz.app42.gaming.multiplayer.client.listener.NotifyListener;
 
+import org.javatuples.Pair;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Observable;
+import java.util.Observer;
+
+import wizard_team.wizards_tale.appwarp_listeners.ConnReqEvent;
+import wizard_team.wizards_tale.appwarp_listeners.NotifyEvent;
 import wizard_team.wizards_tale.components.BombLayerComponent;
 import wizard_team.wizards_tale.components.CounterComponent;
 import wizard_team.wizards_tale.components.GameTimeComponent;
@@ -49,6 +65,7 @@ import wizard_team.wizards_tale.components.VelocityComponent;
 import wizard_team.wizards_tale.systems.CountDownSystem;
 import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
+import wizard_team.wizards_tale.systems.NetworkSystem;
 import wizard_team.wizards_tale.systems.PowerupRenderSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
 import wizard_team.wizards_tale.systems.TimedRenderSystem;
@@ -61,7 +78,7 @@ import wizard_team.wizards_tale.systems.VelocityMovementSystem;
 import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
-public class SinglePlayerScreen implements Screen {
+public class SinglePlayerScreen implements Screen, Observer {
 
     private WizardsTaleGame game;
     private Skin skin;
@@ -95,6 +112,9 @@ public class SinglePlayerScreen implements Screen {
 
 
     private InputSystem inputSystem;
+    private String tag = "SinglePlayerScreen";
+    private NetworkSystem networkSystem;
+    private Label scoreList;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -107,6 +127,10 @@ public class SinglePlayerScreen implements Screen {
         viewport.apply(true);
         this.stage = createStage(viewport);
         Gdx.input.setInputProcessor(this.stage);
+
+        // Subscribe to observables
+        game.listeners.notifyListener.addObserver(this);
+        game.listeners.chatRequestListener.addObserver(this);
 
         // Load assets
         assetManager.load("sprites/black_mage.png", Texture.class);
@@ -177,11 +201,13 @@ public class SinglePlayerScreen implements Screen {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(10));
+        clock.add(new CounterComponent(45));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
         // Systems
+        this.networkSystem = new NetworkSystem(game);
+        eng.addSystem(networkSystem);
         eng.addSystem(new CountDownSystem());
         eng.addSystem(new GameCycleSystem(game, this));
 
@@ -214,12 +240,17 @@ public class SinglePlayerScreen implements Screen {
         stage.addActor(topTable);
         topTable.setFillParent(true);
         topTable.center().top();
+        topTable.setDebug(true);
 
         //Show gametime
         clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
         clockbutton.setBounds(0,0, 400, 400);
         clockbutton.setTouchable(Touchable.disabled);
-        topTable.add(clockbutton).width(200).height(50);
+        topTable.add(clockbutton).width(200).height(50).top().center();
+
+        // Show other players' scores
+        scoreList = new Label("Bob: 10\nBobby: 100", skin);
+        topTable.add(scoreList).top().right().expandY();
 
         Table rootTable = new Table();
         stage.addActor(rootTable);
@@ -273,6 +304,19 @@ public class SinglePlayerScreen implements Screen {
         }
 
         engine.update(dt);
+
+        String s = "";
+        HashMap<String, Integer> scores = networkSystem.scores;
+        scores = networkSystem.scores;
+        LinkedList<Map.Entry<String, Integer>> scoreList2 = new LinkedList(scores.entrySet());
+        for (Map.Entry<String, Integer> stringIntegerEntry : scoreList2) {
+            String key = stringIntegerEntry.getKey();
+            int value = stringIntegerEntry.getValue();
+            s.concat(String.format("%s: %d\n", key, value));
+        }
+
+        scoreList.setText(s);
+
         stage.act(dt);
         stage.draw();
         //spriteBatch.begin();
@@ -318,5 +362,38 @@ public class SinglePlayerScreen implements Screen {
                 eng.addEntity(tile);
             }
         }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+
+        Gdx.app.log(tag, observable.toString() + " " + o.toString());
+
+        if(observable instanceof NotifyListener) {
+            Pair notification = (Pair) o;
+            NotifyEvent type = (NotifyEvent) notification.getValue0();
+            Object payload = notification.getValue1();
+
+            switch (type) {
+
+                case CHAT_RECEIVED:
+                    networkSystem.sendMessage((ChatEvent) payload);
+                    break;
+            }
+
+        }
+
+        if(observable instanceof ConnectionRequestListener) {
+            Pair message = (Pair) o;
+            ConnReqEvent type = (ConnReqEvent) message.getValue0();
+            switch (type) {
+
+                case DISCONNECT_DONE:
+                    break;
+                case CONNECT_DONE:
+                    break;
+            }
+        }
+
     }
 }

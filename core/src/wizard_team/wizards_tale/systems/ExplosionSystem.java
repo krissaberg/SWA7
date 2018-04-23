@@ -185,6 +185,9 @@ public class ExplosionSystem extends IteratingSystem {
 
                         //Check if we have exploded over a destroyable
                         if (destroyable_x == cellPos.x & destroyable_y == cellPos.y) {
+                            for (Entity entity : getEngine().getEntitiesFor(Family.all(ScoreComponent.class).get())) {
+                                entity.getComponent(ScoreComponent.class).deaths++;
+                            }
                             // if hp=10 a player is hit and killed
                             if (destroyableComponent.hp == 10) {
                                 ScoreComponent score = scoreMapper.get(destroyable);

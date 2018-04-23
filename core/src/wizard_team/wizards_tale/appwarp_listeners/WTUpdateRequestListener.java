@@ -4,14 +4,18 @@ import com.shephertz.app42.gaming.multiplayer.client.listener.UpdateRequestListe
 
 import java.util.Observable;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class WTUpdateRequestListener extends Observable implements UpdateRequestListener {
     @Override
     public void onSendUpdateDone(byte b) {
 
+        throw new NotImplementedException();
     }
 
     @Override
     public void onSendPrivateUpdateDone(byte b) {
 
+        throw new NotImplementedException();
     }
 }

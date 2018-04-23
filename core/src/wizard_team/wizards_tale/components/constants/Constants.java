@@ -27,7 +27,7 @@ public class Constants {
     // Time constants
     public static int POWERUP_KEEP_TIME = 25;
     public static final int POWERUP_TIME = 50; //how long the powerup is in play, should be less than explosion time (hacky)
-    public static final int DEFAULT_DETONATION_TIME = 10;
+    public static final int DEFAULT_DETONATION_TIME = 100;
     public static final int DEFAULT_EXPLOSION_TIME = 5;
 
     // Enums

@@ -6,6 +6,7 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.shephertz.app42.gaming.multiplayer.client.WarpClient;
 
@@ -29,6 +30,14 @@ public class WizardsTaleGame extends Game {
     private AssetManager assetManager;
     private Skin skin;
     private String appwarpKeysFilename = "game.properties";
+    private String username;
+    public AppWarpListeners listeners = new AppWarpListeners();
+
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    private int score;
 
     public WarpClient getWarpClient() {
         return warpClient;
@@ -40,6 +49,12 @@ public class WizardsTaleGame extends Game {
     public void create() {
         spriteBatch = new SpriteBatch();
         assetManager = new AssetManager();
+
+        // Randomly pick a username
+        String[] usernames = {"Bob", "Bobby", "Bobbest"};
+        int r = MathUtils.random(99);
+        username = usernames[MathUtils.random(usernames.length - 1)] +
+                " " + String.valueOf(r);
 
         // Load shared assets
         assetManager.load("menuscreen.png", Texture.class);
@@ -90,12 +105,14 @@ public class WizardsTaleGame extends Game {
         try {
             warpClient = WarpClient.getInstance();
 
-            warpClient.addUpdateRequestListener(new WTUpdateRequestListener());
-            warpClient.addRoomRequestListener(new WTRoomRequestListener());
-            warpClient.addNotificationListener(new WTNotificationListener());
-            warpClient.addLobbyRequestListener(new WTLobbyRequestListener());
-            warpClient.addZoneRequestListener(new WTZoneRequestListener());
-            warpClient.addConnectionRequestListener(new WTConnectionRequestListener());
+            warpClient.addUpdateRequestListener(listeners.updateRequestListener);
+            warpClient.addRoomRequestListener(listeners.roomRequestListener);
+            warpClient.addNotificationListener(listeners.notifyListener);
+            warpClient.addLobbyRequestListener(listeners.lobbyRequestListener);
+            warpClient.addZoneRequestListener(listeners.zoneRequestListener);
+            warpClient.addConnectionRequestListener(listeners.connectionRequestListener);
+
+            warpClient.connectWithUserName(username);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,5 +135,9 @@ public class WizardsTaleGame extends Game {
 
     public Skin getSkin() {
         return skin;
+    }
+
+    public int getScore() {
+        return score;
     }
 }
