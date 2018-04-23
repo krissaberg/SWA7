@@ -28,7 +28,7 @@ public class GameCycleSystem extends IteratingSystem {
 
     public void processEntity(Entity e, float dt){
         if(e.getComponent(CounterComponent.class).playTime <= 0){
-            game.setScreen(new MainMenuScreen(game));
+            game.setScreen(new FinishedScreen(game, "TIME IS UP!", 0));
         }
         singlePlayerScreen.setGameTimeLeft(e.getComponent(CounterComponent.class).playTime);
 

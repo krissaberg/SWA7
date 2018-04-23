@@ -5,6 +5,9 @@ import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import com.badlogic.gdx.math.Rectangle;
@@ -15,6 +18,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Gdx;
@@ -58,7 +62,6 @@ import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
-    public boolean isAlive = true;
 
     private WizardsTaleGame game;
     private Skin skin;
@@ -71,6 +74,7 @@ public class SinglePlayerScreen implements Screen {
     private Engine engine;
     private Touchpad touchpad;
     private Button bombButton;
+    private TextButton clockbutton;
     private float gameTimeLeft;
 
     private Texture whiteMageTex;
@@ -79,6 +83,7 @@ public class SinglePlayerScreen implements Screen {
     private Texture softWallTexture;
     private Texture bombTexture;
     private Texture explosionTexture;
+    private Texture playbackground;
 
 
     private Texture speedTexture;
@@ -90,7 +95,6 @@ public class SinglePlayerScreen implements Screen {
 
 
     private InputSystem inputSystem;
-    private Label gameTime;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -116,6 +120,7 @@ public class SinglePlayerScreen implements Screen {
         assetManager.load("sprites/powerup_power.png", Texture.class);
         assetManager.load("sprites/powerup_range.png", Texture.class);
         assetManager.load("sprites/powerup_amount.png", Texture.class);
+        assetManager.load("playbackground.png", Texture.class);
         assetManager.finishLoading();
 
         blackMageTex = assetManager.get("sprites/black_mage.png", Texture.class);
@@ -124,10 +129,9 @@ public class SinglePlayerScreen implements Screen {
         bombTexture = assetManager.get("sprites/bomb.png", Texture.class);
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
-
         speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
         rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
-
+        playbackground = assetManager.get("playbackground.png", Texture.class);
 
 
         // Create engine
@@ -136,7 +140,7 @@ public class SinglePlayerScreen implements Screen {
 
     public void setGameTimeLeft(float gameTimeLeft) {
         this.gameTimeLeft = gameTimeLeft;
-        gameTime.setText("" + Math.round(gameTimeLeft));
+        clockbutton.setText("" + Math.round(gameTimeLeft) + " seconds left");
     }
 
     private Engine createEngine() {
@@ -157,7 +161,8 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
         playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
-        //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
         playerCharacter.add(new ScoreComponent(0, 0));
         playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
@@ -172,7 +177,7 @@ public class SinglePlayerScreen implements Screen {
 
         // Clock for Game Cycle entity
         Entity clock = new Entity();
-        clock.add(new CounterComponent(100));
+        clock.add(new CounterComponent(10));
         clock.add(new GameTimeComponent());
         eng.addEntity(clock);
 
@@ -205,15 +210,16 @@ public class SinglePlayerScreen implements Screen {
 
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
-
         Table topTable = new Table();
         stage.addActor(topTable);
         topTable.setFillParent(true);
         topTable.center().top();
+
         //Show gametime
-        gameTime = new Label(gameTimeLeft + "", skin);
-        gameTime.setFontScale(3);
-        topTable.add(gameTime);
+        clockbutton = new TextButton(gameTimeLeft + "seconds left", skin);
+        clockbutton.setBounds(0,0, 400, 400);
+        clockbutton.setTouchable(Touchable.disabled);
+        topTable.add(clockbutton).width(200).height(50);
 
         Table rootTable = new Table();
         stage.addActor(rootTable);
@@ -260,15 +266,18 @@ public class SinglePlayerScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         //TODO Update server if player with your username is dead.
         //^ The HP of player entity == 0 when dead.
-        if (!isAlive) {
-            System.out.println("IS DEAD");
-            //TODO Go to Game Over screen
+        DestroyableComponent dest = engine.getEntities().get(0).getComponent(DestroyableComponent.class);
+        if (!dest.isAlive) {
+            game.setScreen(new FinishedScreen(game, "GAME OVER!", 4));
+            //TODO Find remaining players in multiplayerScreen and pass it to "place"
         }
 
         engine.update(dt);
-
         stage.act(dt);
         stage.draw();
+        //spriteBatch.begin();
+        //spriteBatch.draw(playbackground, 0, 0, viewport.getWorldWidth(), viewport.getWorldHeight());
+        //spriteBatch.end();
     }
 
     public void resize(int width, int height) {
@@ -281,7 +290,7 @@ public class SinglePlayerScreen implements Screen {
             for (int y = 0; y < Constants.MAP_Y; y++) {
                 Entity tile = new Entity();
                 tile.add(new CellPositionComponent(x,y));
-                tile.add(new DestroyableComponent(0));
+                tile.add(new DestroyableComponent(0, false));
 
                 //TODO: Don't place something on top left L or bottom right L (players start)
                 if (0<=x && x<=1 & Constants.MAP_Y-2 <= y && y<= Constants.MAP_Y-1|| x==Constants.MAP_X & y==0) {
@@ -302,7 +311,7 @@ public class SinglePlayerScreen implements Screen {
                     } else {
                         // Place soft blocks
                         tile.add(new SpriteComponent(softWallTexture));
-                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP));
+                        tile.add(new DestroyableComponent(Constants.DEFAULT_BLOCK_HP, false));
                         tile.add(new CollideableComponent(Constants.SOFT_BLOCK_HEIGHT, Constants.CollideableType.HARD));
                     }
                 }

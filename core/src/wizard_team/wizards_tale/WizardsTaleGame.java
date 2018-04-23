@@ -21,7 +21,8 @@ public class WizardsTaleGame extends Game {
     assetManager = new AssetManager();
 
     // Load shared assets
-    assetManager.load("menu_background.png", Texture.class);
+    //assetManager.load("menu_background.png", Texture.class);
+    assetManager.load("menuscreen.png", Texture.class);
     assetManager.load("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
     // Block until shared assets are loaded
@@ -29,7 +30,6 @@ public class WizardsTaleGame extends Game {
     skin = assetManager.get("gdx-skins-master/neon/skin/neon-ui.json", Skin.class);
 
 //    setScreen(new MainMenuScreen(this, spriteBatch, skin, assetManager));
-    setScreen(new MainMenuScreen(this));
     setScreen(new MainMenuScreen(this));
   }
 
