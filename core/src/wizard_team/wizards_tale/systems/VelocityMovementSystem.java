@@ -60,8 +60,8 @@ public class VelocityMovementSystem extends IteratingSystem {
                     .getEntitiesFor(Family.all(BoundRectComponent.class, PositionComponent.class).get());
 
     // Do the move.
-    pos.x += vel.v_x * dt;
-    pos.y += vel.v_y * dt;
+    pos.x += vel.v_x * dt * vel.buff;
+    pos.y += vel.v_y * dt * vel.buff;
 
     // Check if there's a collision. If there is, undo the move.
     if (boundMapper.has(e)) {
@@ -71,8 +71,8 @@ public class VelocityMovementSystem extends IteratingSystem {
         if (e != other && cantPassThrough(e, other)) {
           BoundRectComponent otherBound = boundMapper.get(other);
           if (bound.boundRect.overlaps(otherBound.boundRect)) {
-            pos.x -= vel.v_x * dt;
-            pos.y -= vel.v_y * dt;
+            pos.x -= vel.v_x * dt* vel.buff;
+            pos.y -= vel.v_y * dt* vel.buff;
             bound.boundRect.setPosition(pos.x, pos.y);
           }
         }

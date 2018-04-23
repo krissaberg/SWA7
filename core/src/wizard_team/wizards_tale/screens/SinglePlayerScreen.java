@@ -88,8 +88,6 @@ public class SinglePlayerScreen implements Screen {
 
     private Texture speedTexture;
     private Texture rangeTexture;
-    private Texture powerTexture;
-    private Texture amountTexture;
 
     private Texture powerupTexture;
     private ComponentMapper<DestroyableComponent> destroyableMapper =
@@ -132,11 +130,8 @@ public class SinglePlayerScreen implements Screen {
         explosionTexture = assetManager.get("sprites/explosion.png", Texture.class);
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
         speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
-        powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
         rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
-        amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
         playbackground = assetManager.get("playbackground.png", Texture.class);
-
 
 
         // Create engine
@@ -165,10 +160,11 @@ public class SinglePlayerScreen implements Screen {
         Rectangle playerBound = new Rectangle(0, 0, blackMageTex.getWidth(), blackMageTex.getHeight());
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
-        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
-        //TODO: put back in, handle death
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
+
         playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
         playerCharacter.add(new ScoreComponent(0, 0));
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
         eng.addEntity(playerCharacter);
 
@@ -205,7 +201,7 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupRenderSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupRenderSystem(speedTexture, rangeTexture));
         eng.addSystem(new PowerupSystem());
 
 
