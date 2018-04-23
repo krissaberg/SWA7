@@ -30,12 +30,11 @@ public class MainMenuScreen implements Screen {
   Viewport viewport;
   Camera camera;
 
-  public MainMenuScreen(
-      WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
-    this.assetManager = assetManager;
+  public MainMenuScreen(WizardsTaleGame game) {
+    this.assetManager = game.getAssetManager();
     this.game = game;
-    this.skin = skin;
-    this.spriteBatch = spriteBatch;
+    this.skin = game.getSkin();
+    this.spriteBatch = game.getSpriteBatch();
     this.camera = new OrthographicCamera();
     this.viewport = new FitViewport(800, 600, this.camera);
     viewport.apply(true);

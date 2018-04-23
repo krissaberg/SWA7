@@ -1,8 +1,11 @@
 package wizard_team.wizards_tale.screens;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.Screen;
 
 import wizard_team.wizards_tale.WizardsTaleGame;
+
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -26,15 +29,21 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 
 import wizard_team.wizards_tale.components.BombLayerComponent;
+import wizard_team.wizards_tale.components.CounterComponent;
+import wizard_team.wizards_tale.components.GameTimeComponent;
+
 import wizard_team.wizards_tale.components.BoundRectComponent;
 import wizard_team.wizards_tale.components.CellPositionComponent;
 import wizard_team.wizards_tale.components.CollideableComponent;
 import wizard_team.wizards_tale.components.DestroyableComponent;
 import wizard_team.wizards_tale.components.PositionComponent;
+import wizard_team.wizards_tale.components.ScoreComponent;
 import wizard_team.wizards_tale.components.SpriteComponent;
 import wizard_team.wizards_tale.components.ReceiveInputComponent;
 
 import wizard_team.wizards_tale.components.VelocityComponent;
+import wizard_team.wizards_tale.systems.CountDownSystem;
+import wizard_team.wizards_tale.systems.GameCycleSystem;
 import wizard_team.wizards_tale.components.constants.Constants;
 import wizard_team.wizards_tale.systems.PowerupRenderSystem;
 import wizard_team.wizards_tale.systems.PowerupSystem;
@@ -49,6 +58,8 @@ import wizard_team.wizards_tale.systems.RandomWalkerSystem;
 import wizard_team.wizards_tale.systems.InputSystem;
 
 public class SinglePlayerScreen implements Screen {
+    public boolean isAlive = true;
+
     private WizardsTaleGame game;
     private Skin skin;
     private Stage stage;
@@ -60,6 +71,7 @@ public class SinglePlayerScreen implements Screen {
     private Engine engine;
     private Touchpad touchpad;
     private Button bombButton;
+    private float gameTimeLeft;
 
     private Texture whiteMageTex;
     private Texture blackMageTex;
@@ -68,10 +80,17 @@ public class SinglePlayerScreen implements Screen {
     private Texture bombTexture;
     private Texture explosionTexture;
 
+
     private Texture speedTexture;
     private Texture rangeTexture;
 
+    private Texture powerupTexture;
+    private ComponentMapper<DestroyableComponent> destroyableMapper =
+            ComponentMapper.getFor(DestroyableComponent.class);
+
+
     private InputSystem inputSystem;
+    private Label gameTime;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -115,6 +134,11 @@ public class SinglePlayerScreen implements Screen {
         this.engine = createEngine();
     }
 
+    public void setGameTimeLeft(float gameTimeLeft) {
+        this.gameTimeLeft = gameTimeLeft;
+        gameTime.setText("" + Math.round(gameTimeLeft));
+    }
+
     private Engine createEngine() {
         Engine eng = new Engine();
 
@@ -134,6 +158,8 @@ public class SinglePlayerScreen implements Screen {
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
         playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
         //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        playerCharacter.add(new ScoreComponent(0, 0));
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
         eng.addEntity(playerCharacter);
 
@@ -144,7 +170,16 @@ public class SinglePlayerScreen implements Screen {
         // MAP_X and MAP_Y define the Map-grid
         createMap(eng);
 
+        // Clock for Game Cycle entity
+        Entity clock = new Entity();
+        clock.add(new CounterComponent(100));
+        clock.add(new GameTimeComponent());
+        eng.addEntity(clock);
+
         // Systems
+        eng.addSystem(new CountDownSystem());
+        eng.addSystem(new GameCycleSystem(game, this));
+
         eng.addSystem(new RandomWalkerSystem());
         eng.addSystem(new VelocityMovementSystem());
         eng.addSystem(new RenderSystem(spriteBatch));
@@ -157,7 +192,7 @@ public class SinglePlayerScreen implements Screen {
 
         //Bomb Systems
         //eng.addSystem(new BombSystem(bombTexture));
-        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture));
+        eng.addSystem(new ExplosionSystem(bombTexture, explosionTexture, this));
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
@@ -171,10 +206,19 @@ public class SinglePlayerScreen implements Screen {
     private Stage createStage(Viewport viewport) {
         Stage stage = new Stage(viewport);
 
+        Table topTable = new Table();
+        stage.addActor(topTable);
+        topTable.setFillParent(true);
+        topTable.center().top();
+        //Show gametime
+        gameTime = new Label(gameTimeLeft + "", skin);
+        gameTime.setFontScale(3);
+        topTable.add(gameTime);
+
         Table rootTable = new Table();
         stage.addActor(rootTable);
         rootTable.setFillParent(true);
-        rootTable.setDebug(true);
+        //rootTable.setDebug(true);
         rootTable.left().bottom();
 
         Touchpad touchpad = new Touchpad(15, skin);
@@ -214,6 +258,12 @@ public class SinglePlayerScreen implements Screen {
     public void render(float dt) {
         Gdx.gl.glClearColor(0.1f, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        //TODO Update server if player with your username is dead.
+        //^ The HP of player entity == 0 when dead.
+        if (!isAlive) {
+            System.out.println("IS DEAD");
+            //TODO Go to Game Over screen
+        }
 
         engine.update(dt);
 
