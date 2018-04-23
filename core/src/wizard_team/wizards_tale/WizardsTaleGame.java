@@ -57,6 +57,7 @@ public class WizardsTaleGame extends Game {
                 " " + String.valueOf(r);
 
         // Load shared assets
+        assetManager.load("tutorial.png", Texture.class);
         assetManager.load("menuscreen.png", Texture.class);
         assetManager.load("menu_background.png", Texture.class);
         assetManager.load("playbackground.png", Texture.class);
