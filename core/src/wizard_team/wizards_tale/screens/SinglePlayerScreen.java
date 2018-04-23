@@ -70,8 +70,6 @@ public class SinglePlayerScreen implements Screen {
 
     private Texture speedTexture;
     private Texture rangeTexture;
-    private Texture powerTexture;
-    private Texture amountTexture;
 
     private InputSystem inputSystem;
 
@@ -109,9 +107,7 @@ public class SinglePlayerScreen implements Screen {
         softWallTexture = assetManager.get("sprites/soft_wall.png", Texture.class);
 
         speedTexture = assetManager.get("sprites/powerup_speed.png", Texture.class);
-        powerTexture = assetManager.get("sprites/powerup_power.png", Texture.class);
         rangeTexture = assetManager.get("sprites/powerup_range.png", Texture.class);
-        amountTexture = assetManager.get("sprites/powerup_amount.png", Texture.class);
 
 
 
@@ -136,7 +132,7 @@ public class SinglePlayerScreen implements Screen {
         Rectangle playerBound = new Rectangle(0, 0, blackMageTex.getWidth(), blackMageTex.getHeight());
         playerCharacter.add(new BoundRectComponent(playerBound));
         playerCharacter.add(new CollideableComponent(0, Constants.CollideableType.SOFT));
-        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE, Constants.DEFAULT_MAX_BOMBS));
+        playerCharacter.add(new BombLayerComponent(Constants.DEFAULT_BOMB_RANGE, Constants.DEFAULT_BOMB_DEPTH, Constants.DEFAULT_BOMB_DAMAGE));
         //TODO: put back in, handle death playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
 
         eng.addEntity(playerCharacter);
@@ -165,7 +161,7 @@ public class SinglePlayerScreen implements Screen {
         eng.addSystem(new TimedRenderSystem(spriteBatch));
 
         // PU
-        eng.addSystem(new PowerupRenderSystem(speedTexture,amountTexture,rangeTexture,powerTexture));
+        eng.addSystem(new PowerupRenderSystem(speedTexture, rangeTexture));
         eng.addSystem(new PowerupSystem());
 
 
@@ -265,17 +261,3 @@ public class SinglePlayerScreen implements Screen {
         }
     }
 }
-
-        /* Random walkers
-        for (int i = 0; i < 10; i++) {
-            Entity walker = new Entity();
-            walker.add(new PositionComponent(MathUtils.random(700), MathUtils.random(500)));
-            walker.add(new SpriteComponent(whiteMageTex));
-            walker.add(new RandomMovementComponent(MathUtils.random(3)));
-            walker.add(new VelocityComponent());
-            walker.add(new BoundRectComponent(new Rectangle(0, 0,
-                    whiteMageTex.getWidth(), whiteMageTex.getHeight())));
-            walker.add(new CollideableComponent(Constants.CollidableType.SOFT));
-            eng.addEntity(walker);
-        }
-        */

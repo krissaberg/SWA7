@@ -13,18 +13,8 @@ import wizard_team.wizards_tale.components.constants.Constants;
 
 public class SpreadableComponent implements Component {
     public int depth;
-    public Constants.SpreadTypes spreadType;
 
     public SpreadableComponent(int depth) {
         this.depth = depth;
     }
-
-    public int getdepth() {
-        return depth;
-    }
-
-    public void setdepth(int depth) {
-        this.depth = depth;
-    }
-
 }
