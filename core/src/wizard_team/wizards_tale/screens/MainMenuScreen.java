@@ -62,11 +62,12 @@ public class MainMenuScreen implements Screen {
     rootTable.setFillParent(true);
 
     powerupBox = new CheckBox("Powerups enabled", skin);
-    rootTable.add(powerupBox);
+    rootTable.add(powerupBox).center();
     rootTable.row();
 
     timeLabel = new Label("", skin);
     slider = new Slider(20, 60, 1, false, skin);
+    rootTable.add(new Label("Game duration (s):", skin));
     rootTable.add(timeLabel);
     rootTable.add(slider);
 
