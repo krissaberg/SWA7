@@ -164,7 +164,7 @@ public class SinglePlayerScreen implements Screen {
 
         playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
         playerCharacter.add(new ScoreComponent(0, 0));
-        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP));
+        playerCharacter.add(new DestroyableComponent(Constants.DEFAULT_PLAYER_HP, true));
 
         eng.addEntity(playerCharacter);
 

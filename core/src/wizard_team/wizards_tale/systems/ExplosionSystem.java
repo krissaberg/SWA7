@@ -53,7 +53,7 @@ public class ExplosionSystem extends IteratingSystem {
     private ComponentMapper<BombLayerComponent> bombLayerMapper =
             ComponentMapper.getFor(BombLayerComponent.class);
 
-    public ExplosionSystem(Texture bombTexture, Texture explosionTexture) {
+    public ExplosionSystem(Texture bombTexture, Texture explosionTexture, SinglePlayerScreen singlePlayerScreen) {
         super(Family.all(DamagerComponent.class, TimedEffectComponent.class).get());
         this.bombTexture = bombTexture;
         this.explosionTexture = explosionTexture;

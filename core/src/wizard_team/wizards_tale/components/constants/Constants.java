@@ -20,6 +20,7 @@ public class Constants {
     public static final int HARD_BLOCK_HEIGHT = 10;
     public static final int SOFT_BLOCK_HEIGHT = 1;
     public static final int DEFAULT_BLOCK_HP = 1;
+    public static final int DEFAULT_PLAYER_HP = 10;
 
     public static int DEFAULT_SPEED = 1;
 
