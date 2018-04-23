@@ -114,7 +114,7 @@ public class SinglePlayerScreen implements Screen, Observer {
     private InputSystem inputSystem;
     private String tag = "SinglePlayerScreen";
     private NetworkSystem networkSystem;
-    private Label scoreList;
+    private TextButton scoreList;
 
     public SinglePlayerScreen(
             WizardsTaleGame game, SpriteBatch spriteBatch, Skin skin, AssetManager assetManager) {
@@ -239,7 +239,7 @@ public class SinglePlayerScreen implements Screen, Observer {
         Table topTable = new Table();
         stage.addActor(topTable);
         topTable.setFillParent(true);
-        topTable.center().top();
+        topTable.top();
         topTable.setDebug(true);
 
         //Show gametime
@@ -249,7 +249,7 @@ public class SinglePlayerScreen implements Screen, Observer {
         topTable.add(clockbutton).width(200).height(50).top().center();
 
         // Show other players' scores
-        scoreList = new Label("Bob: 10\nBobby: 100", skin);
+        scoreList = new TextButton("Bob: 10\nBobby: 100", skin);
         topTable.add(scoreList).top().right().expandY();
 
         Table rootTable = new Table();
@@ -305,17 +305,17 @@ public class SinglePlayerScreen implements Screen, Observer {
 
         engine.update(dt);
 
-        String s = "";
+        StringBuilder s = new StringBuilder();
         HashMap<String, Integer> scores = networkSystem.scores;
         scores = networkSystem.scores;
         LinkedList<Map.Entry<String, Integer>> scoreList2 = new LinkedList(scores.entrySet());
         for (Map.Entry<String, Integer> stringIntegerEntry : scoreList2) {
             String key = stringIntegerEntry.getKey();
             int value = stringIntegerEntry.getValue();
-            s.concat(String.format("%s: %d\n", key, value));
+            s.append(String.format("%s: %d\n", key, value));
         }
 
-        scoreList.setText(s);
+        scoreList.setText(s.toString());
 
         stage.act(dt);
         stage.draw();
